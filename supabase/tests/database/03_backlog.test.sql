@@ -29,12 +29,14 @@ select throws_ok(
   $$insert into public.demandas (titulo, lider_id) values ('X', '00000000-0000-4000-a000-000000000011')$$,
   '42501', null, 'desenvolvedor não cria demanda'
 );
-update public.demandas set status = 'concluida' where id = '00000000-0000-4000-f000-000000000001';
+-- DEM-0009 está alocada só ao Thiago; o Bruno (dev1) não pode alterá-la.
+-- (A alteração de status pelo desenvolvedor alocado é testada em 04_planejamento.)
+update public.demandas set status = 'concluida' where id = '00000000-0000-4000-f000-000000000009';
 reset role;
 select is(
-  (select status from public.demandas where id = '00000000-0000-4000-f000-000000000001'),
-  'em_execucao'::public.status_demanda,
-  'desenvolvedor ainda não altera demandas (alocação chega na etapa 4)'
+  (select status from public.demandas where id = '00000000-0000-4000-f000-000000000009'),
+  'planejada'::public.status_demanda,
+  'desenvolvedor não altera demanda em que não está alocado'
 );
 
 select pg_temp.entrar_como('administrativo@example.com');

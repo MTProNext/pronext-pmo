@@ -13,7 +13,9 @@ Documento vivo: atualizado a cada etapa. Serve de contexto para o Lovable e o Cl
   senha no login.
 - **Fase 1, etapa 3 (backlog)**: concluída. Tabela `demandas`, lista com filtros e página
   de detalhe com edição e troca de status.
-- Próxima etapa da Fase 1: 4) planejamento semanal.
+- **Fase 1, etapa 4A (planejamento: banco e regras)**: concluída. Semanas, itens,
+  replanejamentos, capacidade efetiva, views de capacidade e pendências da etapa 3.
+- Próxima: etapa 4B (telas de planejamento, replanejamento e "Minha semana").
 
 ## Stack
 - Vite 5 + React 18 + TypeScript (SPA), plugin `@vitejs/plugin-react-swc`
@@ -74,6 +76,9 @@ supabase/
 - `status_demanda`: `nova`, `priorizada`, `planejada`, `em_execucao`, `bloqueada`,
   `concluida`, `cancelada`
 - `tipo_demanda`: `demanda`, `urgencia`, `correcao`, `atividade_interna`
+- `status_semana`: `rascunho`, `publicada`, `confirmada`, `em_execucao`, `revisada`
+- `faixa_capacidade`: `planejado`, `reserva`, `interno`
+- `tipo_replanejamento`: `inclusao`, `alteracao_horas`, `remocao`, `entrada_p1_p2`, `outro`
 
 Rótulos em pt-BR de todos os enums: `src/lib/papeis.ts` e `src/lib/rotulos.ts`.
 
@@ -136,13 +141,63 @@ Quarta de Cinzas e 08/12 de Jacareí.
 
 Constraints: demanda interna sem contrato/projeto; atividade interna sem cliente.
 
-### Modelo planejado (etapa 4)
-`semanas`, `planejamento_itens`, `replanejamentos`, função `capacidade_efetiva` e views de
-capacidade (proposta aprovada do passo 1). Também na etapa 4:
-- registro automático de replanejamento quando entra (ou sobe para) P1/P2 com semana
-  publicada/confirmada/em execução;
-- desenvolvedor alocado altera o status da demanda (política + trigger que bloqueia as
-  demais colunas).
+Triggers adicionados na etapa 4A:
+- `demandas_registrar_p1_p2`: demanda que entra como P1/P2 (ou é elevada para P1/P2), e
+  não está concluída/cancelada, gera um `replanejamentos` do tipo `entrada_p1_p2` em cada
+  semana publicada/confirmada/em execução que ainda não terminou (`fim >= current_date`),
+  com o líder da demanda como responsável.
+- `demandas_guardar_desenvolvedor`: o desenvolvedor só altera `status`, e só para
+  `planejada`, `em_execucao`, `bloqueada` ou `concluida`.
+
+### `semanas`
+`inicio` (único, segunda-feira), `fim` (gerado: início + 4), `status`, `publicada_em/por`,
+`confirmada_em/por`, `iniciada_em/por`, `revisada_em/por`, `observacoes`, `created_by`.
+- Status só muda por `avancar_semana()` (trigger `semanas_guardar`); a data só muda em rascunho.
+
+### `planejamento_itens`
+`semana_id` (cascade), `colaborador_id`, `demanda_id` (o trio é único), `horas_planejadas`
+(> 0), `faixa`, `observacao`, `created_by`.
+- `planejamento_itens_normalizar`: colaborador ativo com horas de desenvolvimento; demanda
+  não concluída/cancelada; faixa `interno` automática para demanda sem cliente (e nunca
+  `interno` para demanda de cliente).
+- `planejamento_itens_guardar`: depois de publicada a semana, inclusão/alteração/exclusão
+  direta é recusada; só por `replanejar_item()`.
+- `planejamento_itens_marcar_planejada`: alocação em semana publicada ou posterior muda a
+  demanda `nova`/`priorizada` para `planejada` (o mesmo acontece para toda a grade ao publicar).
+
+### `replanejamentos` (log, só inclusão, sem update/delete)
+`semana_id`, `tipo`, `demanda_id`, `planejamento_item_id` (set null se o item sair),
+`colaborador_afetado_id`, `horas_antes`, `horas_depois`, `motivo`, `impacto` (ambos
+obrigatórios), `responsavel_id`, `created_at`, `created_by`. Gravado só por
+`replanejar_item()` e pelo trigger de P1/P2.
+
+### Funções do planejamento
+| Função | O que faz |
+|---|---|
+| `avancar_semana(semana_id)` | Líder técnico. Avança rascunho → publicada → confirmada → em_execucao → revisada, registra quem/quando; ao publicar, marca demandas como planejadas |
+| `replanejar_item(semana, colaborador, demanda, horas, motivo, impacto, faixa?)` | Líder técnico, semana publicada/confirmada/em execução. `horas > 0` inclui ou altera; `0`/nulo remove. Grava o replanejamento e retorna seu id |
+| `horas_indisponiveis(colaborador, inicio)` | Horas de jornada indisponíveis nos dias úteis da semana; no mesmo dia vale a maior indisponibilidade (não soma férias + feriado) |
+| `capacidade_efetiva(colaborador, inicio)` | `horas_dev − horas_indisponiveis × horas_dev ÷ jornada` (proporcional), mínimo 0, 2 casas |
+| `semana_visivel(semana_id)` | Rascunho só para Proprietário e Líder |
+| `alocado_na_demanda(demanda_id)` | Usuário alocado na demanda em semana publicada/confirmada/em execução |
+| `alterando_planejamento()` | Sinalizador de transação usado pelas funções acima para passar pelos triggers de guarda |
+
+### Views (security_invoker)
+- `v_capacidade_colaborador_semana`: por semana × colaborador com horas de dev:
+  `horas_dev_semanais`, `horas_indisponiveis` (desconto em horas de dev),
+  `capacidade_efetiva`, `horas_planejado`, `horas_reserva`, `horas_interno`,
+  `horas_planejadas`, `ocupacao_pct` (planejadas ÷ capacidade × 100) e
+  `excede_capacidade`. Desenvolvedor vê só a própria linha.
+- `v_resumo_semana`: por semana: `capacidade_total`, percentuais e `limite_planejado/
+  reserva/interno` (capacidade × % da configuração), horas por faixa, `ocupacao_pct`,
+  `alerta_planejado/reserva/interno` (horas da faixa > limite),
+  `colaboradores_acima_capacidade` e `replanejamentos` (quantidade).
+
+### Seed do planejamento
+Semanas 16/11/2026 (revisada, feriado 20/11), 23/11/2026 (em execução, com treinamento de
+meio período do Rafael, ausência da Juliana e meio período da Fernanda) e 30/11/2026
+(rascunho, Diego acima da capacidade por causa do treinamento). Quatro replanejamentos de
+exemplo nas semanas publicadas.
 
 ## Perfis e RLS
 
@@ -167,7 +222,10 @@ Usuário autenticado sem colaborador ativo não lê nada. `anon` não lê nada.
 | `contratos_valores` | ler, criar, alterar, excluir | — | — | ler, criar, alterar, excluir |
 | `projetos` | ler, criar, alterar | ler, criar, alterar | ler | ler |
 | `indisponibilidades` | ler, criar, alterar, excluir | ler, criar, alterar, excluir | ler (as suas e as globais) | ler, criar, alterar, excluir |
-| `demandas` | ler, criar, alterar | ler, criar, alterar | ler (backlog inteiro) | ler |
+| `demandas` | ler, criar, alterar | ler, criar, alterar | ler (backlog inteiro); alterar só o status das demandas em que está alocado | ler |
+| `semanas` | ler (inclusive rascunho) | ler, criar (rascunho), alterar (status só por função), excluir rascunho | ler publicada ou posterior | ler publicada ou posterior |
+| `planejamento_itens` | ler | ler; criar/alterar/excluir em rascunho; depois só `replanejar_item` | ler os seus (semana publicada ou posterior) | ler (semana publicada ou posterior) |
+| `replanejamentos` | ler | ler (gravação por função) | ler os que o afetam | ler |
 
 A divisão de colunas em `configuracoes` é garantida pelo trigger `configuracoes_guardar_colunas`.
 Nenhuma tabela de cadastro permite exclusão, exceto `indisponibilidades` e `contratos_valores`;
@@ -331,6 +389,13 @@ menu. Esse controle é só de interface; a segurança está na RLS.
 - Demandas: transições de status livres para líder e proprietário (sem máquina de estados
   rígida, para não burocratizar); `concluida_em` acompanha o status. O status `planejada`
   ainda é manual; na etapa 4 poderá ser ajustado pelo planejamento.
+- Planejamento: ações (avançar semana, replanejar) são funções `security definer` com
+  checagem explícita de papel, e os triggers de guarda só deixam passar alterações feitas
+  por elas (sinalizador `pmo.alterando_planejamento`, que o cliente não consegue definir
+  via PostgREST). Sem usuário autenticado (seed, service role) os guardas não se aplicam.
+- Proprietário acompanha o planejamento (lê tudo, inclusive rascunho), mas não avança
+  semana nem replaneja; isso é do líder técnico.
+- O banco roda em UTC; a regra de P1/P2 usa `current_date` do banco.
 - Recuperação de senha: `resetPasswordForEmail` com retorno em `/redefinir-senha`
   (permitido em `additional_redirect_urls` do `config.toml`). Localmente o e-mail chega no
   Mailpit (http://127.0.0.1:54324). Na nuvem, configurar as Redirect URLs do Auth.

@@ -23,6 +23,12 @@ export type Database = {
 isOneToOne: false
       referencedRelation: "colaboradores"
       referencedColumns: ["id"]
+    },{
+      foreignKeyName: "clientes_created_by_fkey"
+      columns: ["created_by"]
+isOneToOne: false
+      referencedRelation: "v_capacidade_colaborador_semana"
+      referencedColumns: ["colaborador_id"]
     }
                   ]
                 },"colaboradores": {
@@ -43,6 +49,12 @@ isOneToOne: false
 isOneToOne: false
       referencedRelation: "colaboradores"
       referencedColumns: ["id"]
+    },{
+      foreignKeyName: "colaboradores_lider_id_fkey"
+      columns: ["lider_id"]
+isOneToOne: false
+      referencedRelation: "v_capacidade_colaborador_semana"
+      referencedColumns: ["colaborador_id"]
     }
                   ]
                 },"configuracoes": {
@@ -63,6 +75,12 @@ isOneToOne: false
 isOneToOne: false
       referencedRelation: "colaboradores"
       referencedColumns: ["id"]
+    },{
+      foreignKeyName: "configuracoes_updated_by_fkey"
+      columns: ["updated_by"]
+isOneToOne: false
+      referencedRelation: "v_capacidade_colaborador_semana"
+      referencedColumns: ["colaborador_id"]
     }
                   ]
                 },"contratos": {
@@ -89,6 +107,12 @@ isOneToOne: false
 isOneToOne: false
       referencedRelation: "colaboradores"
       referencedColumns: ["id"]
+    },{
+      foreignKeyName: "contratos_created_by_fkey"
+      columns: ["created_by"]
+isOneToOne: false
+      referencedRelation: "v_capacidade_colaborador_semana"
+      referencedColumns: ["colaborador_id"]
     }
                   ]
                 },"contratos_valores": {
@@ -142,11 +166,23 @@ isOneToOne: false
       referencedRelation: "colaboradores"
       referencedColumns: ["id"]
     },{
+      foreignKeyName: "demandas_created_by_fkey"
+      columns: ["created_by"]
+isOneToOne: false
+      referencedRelation: "v_capacidade_colaborador_semana"
+      referencedColumns: ["colaborador_id"]
+    },{
       foreignKeyName: "demandas_lider_id_fkey"
       columns: ["lider_id"]
 isOneToOne: false
       referencedRelation: "colaboradores"
       referencedColumns: ["id"]
+    },{
+      foreignKeyName: "demandas_lider_id_fkey"
+      columns: ["lider_id"]
+isOneToOne: false
+      referencedRelation: "v_capacidade_colaborador_semana"
+      referencedColumns: ["colaborador_id"]
     },{
       foreignKeyName: "demandas_projeto_id_fkey"
       columns: ["projeto_id"]
@@ -174,11 +210,85 @@ isOneToOne: false
       referencedRelation: "colaboradores"
       referencedColumns: ["id"]
     },{
+      foreignKeyName: "indisponibilidades_colaborador_id_fkey"
+      columns: ["colaborador_id"]
+isOneToOne: false
+      referencedRelation: "v_capacidade_colaborador_semana"
+      referencedColumns: ["colaborador_id"]
+    },{
       foreignKeyName: "indisponibilidades_created_by_fkey"
       columns: ["created_by"]
 isOneToOne: false
       referencedRelation: "colaboradores"
       referencedColumns: ["id"]
+    },{
+      foreignKeyName: "indisponibilidades_created_by_fkey"
+      columns: ["created_by"]
+isOneToOne: false
+      referencedRelation: "v_capacidade_colaborador_semana"
+      referencedColumns: ["colaborador_id"]
+    }
+                  ]
+                },"planejamento_itens": {
+                  Row: {
+                    "colaborador_id": string,"created_at": string,"created_by": string | null,"demanda_id": string,"faixa": Database["public"]['Enums']["faixa_capacidade"],"horas_planejadas": number,"id": string,"observacao": string | null,"semana_id": string,"updated_at": string
+                  }
+                  ComputedFields: never
+                  Insert: {
+                    "colaborador_id": string,"created_at"?: string,"created_by"?: string | null,"demanda_id": string,"faixa"?: Database["public"]['Enums']["faixa_capacidade"],"horas_planejadas": number,"id"?: string,"observacao"?: string | null,"semana_id": string,"updated_at"?: string
+                  }
+                  Update: {
+                    "colaborador_id"?: string,"created_at"?: string,"created_by"?: string | null,"demanda_id"?: string,"faixa"?: Database["public"]['Enums']["faixa_capacidade"],"horas_planejadas"?: number,"id"?: string,"observacao"?: string | null,"semana_id"?: string,"updated_at"?: string
+                  }
+                  Relationships: [
+                    {
+      foreignKeyName: "planejamento_itens_colaborador_id_fkey"
+      columns: ["colaborador_id"]
+isOneToOne: false
+      referencedRelation: "colaboradores"
+      referencedColumns: ["id"]
+    },{
+      foreignKeyName: "planejamento_itens_colaborador_id_fkey"
+      columns: ["colaborador_id"]
+isOneToOne: false
+      referencedRelation: "v_capacidade_colaborador_semana"
+      referencedColumns: ["colaborador_id"]
+    },{
+      foreignKeyName: "planejamento_itens_created_by_fkey"
+      columns: ["created_by"]
+isOneToOne: false
+      referencedRelation: "colaboradores"
+      referencedColumns: ["id"]
+    },{
+      foreignKeyName: "planejamento_itens_created_by_fkey"
+      columns: ["created_by"]
+isOneToOne: false
+      referencedRelation: "v_capacidade_colaborador_semana"
+      referencedColumns: ["colaborador_id"]
+    },{
+      foreignKeyName: "planejamento_itens_demanda_id_fkey"
+      columns: ["demanda_id"]
+isOneToOne: false
+      referencedRelation: "demandas"
+      referencedColumns: ["id"]
+    },{
+      foreignKeyName: "planejamento_itens_semana_id_fkey"
+      columns: ["semana_id"]
+isOneToOne: false
+      referencedRelation: "semanas"
+      referencedColumns: ["id"]
+    },{
+      foreignKeyName: "planejamento_itens_semana_id_fkey"
+      columns: ["semana_id"]
+isOneToOne: false
+      referencedRelation: "v_capacidade_colaborador_semana"
+      referencedColumns: ["semana_id"]
+    },{
+      foreignKeyName: "planejamento_itens_semana_id_fkey"
+      columns: ["semana_id"]
+isOneToOne: false
+      referencedRelation: "v_resumo_semana"
+      referencedColumns: ["semana_id"]
     }
                   ]
                 },"projetos": {
@@ -212,24 +322,233 @@ isOneToOne: false
       referencedRelation: "colaboradores"
       referencedColumns: ["id"]
     },{
+      foreignKeyName: "projetos_created_by_fkey"
+      columns: ["created_by"]
+isOneToOne: false
+      referencedRelation: "v_capacidade_colaborador_semana"
+      referencedColumns: ["colaborador_id"]
+    },{
       foreignKeyName: "projetos_lider_id_fkey"
       columns: ["lider_id"]
 isOneToOne: false
       referencedRelation: "colaboradores"
       referencedColumns: ["id"]
+    },{
+      foreignKeyName: "projetos_lider_id_fkey"
+      columns: ["lider_id"]
+isOneToOne: false
+      referencedRelation: "v_capacidade_colaborador_semana"
+      referencedColumns: ["colaborador_id"]
+    }
+                  ]
+                },"replanejamentos": {
+                  Row: {
+                    "colaborador_afetado_id": string | null,"created_at": string,"created_by": string | null,"demanda_id": string | null,"horas_antes": number | null,"horas_depois": number | null,"id": string,"impacto": string,"motivo": string,"planejamento_item_id": string | null,"responsavel_id": string,"semana_id": string,"tipo": Database["public"]['Enums']["tipo_replanejamento"]
+                  }
+                  ComputedFields: never
+                  Insert: {
+                    "colaborador_afetado_id"?: string | null,"created_at"?: string,"created_by"?: string | null,"demanda_id"?: string | null,"horas_antes"?: number | null,"horas_depois"?: number | null,"id"?: string,"impacto": string,"motivo": string,"planejamento_item_id"?: string | null,"responsavel_id": string,"semana_id": string,"tipo": Database["public"]['Enums']["tipo_replanejamento"]
+                  }
+                  Update: {
+                    "colaborador_afetado_id"?: string | null,"created_at"?: string,"created_by"?: string | null,"demanda_id"?: string | null,"horas_antes"?: number | null,"horas_depois"?: number | null,"id"?: string,"impacto"?: string,"motivo"?: string,"planejamento_item_id"?: string | null,"responsavel_id"?: string,"semana_id"?: string,"tipo"?: Database["public"]['Enums']["tipo_replanejamento"]
+                  }
+                  Relationships: [
+                    {
+      foreignKeyName: "replanejamentos_colaborador_afetado_id_fkey"
+      columns: ["colaborador_afetado_id"]
+isOneToOne: false
+      referencedRelation: "colaboradores"
+      referencedColumns: ["id"]
+    },{
+      foreignKeyName: "replanejamentos_colaborador_afetado_id_fkey"
+      columns: ["colaborador_afetado_id"]
+isOneToOne: false
+      referencedRelation: "v_capacidade_colaborador_semana"
+      referencedColumns: ["colaborador_id"]
+    },{
+      foreignKeyName: "replanejamentos_created_by_fkey"
+      columns: ["created_by"]
+isOneToOne: false
+      referencedRelation: "colaboradores"
+      referencedColumns: ["id"]
+    },{
+      foreignKeyName: "replanejamentos_created_by_fkey"
+      columns: ["created_by"]
+isOneToOne: false
+      referencedRelation: "v_capacidade_colaborador_semana"
+      referencedColumns: ["colaborador_id"]
+    },{
+      foreignKeyName: "replanejamentos_demanda_id_fkey"
+      columns: ["demanda_id"]
+isOneToOne: false
+      referencedRelation: "demandas"
+      referencedColumns: ["id"]
+    },{
+      foreignKeyName: "replanejamentos_planejamento_item_id_fkey"
+      columns: ["planejamento_item_id"]
+isOneToOne: false
+      referencedRelation: "planejamento_itens"
+      referencedColumns: ["id"]
+    },{
+      foreignKeyName: "replanejamentos_responsavel_id_fkey"
+      columns: ["responsavel_id"]
+isOneToOne: false
+      referencedRelation: "colaboradores"
+      referencedColumns: ["id"]
+    },{
+      foreignKeyName: "replanejamentos_responsavel_id_fkey"
+      columns: ["responsavel_id"]
+isOneToOne: false
+      referencedRelation: "v_capacidade_colaborador_semana"
+      referencedColumns: ["colaborador_id"]
+    },{
+      foreignKeyName: "replanejamentos_semana_id_fkey"
+      columns: ["semana_id"]
+isOneToOne: false
+      referencedRelation: "semanas"
+      referencedColumns: ["id"]
+    },{
+      foreignKeyName: "replanejamentos_semana_id_fkey"
+      columns: ["semana_id"]
+isOneToOne: false
+      referencedRelation: "v_capacidade_colaborador_semana"
+      referencedColumns: ["semana_id"]
+    },{
+      foreignKeyName: "replanejamentos_semana_id_fkey"
+      columns: ["semana_id"]
+isOneToOne: false
+      referencedRelation: "v_resumo_semana"
+      referencedColumns: ["semana_id"]
+    }
+                  ]
+                },"semanas": {
+                  Row: {
+                    "confirmada_em": string | null,"confirmada_por": string | null,"created_at": string,"created_by": string | null,"fim": string | null,"id": string,"iniciada_em": string | null,"iniciada_por": string | null,"inicio": string,"observacoes": string | null,"publicada_em": string | null,"publicada_por": string | null,"revisada_em": string | null,"revisada_por": string | null,"status": Database["public"]['Enums']["status_semana"],"updated_at": string
+                  }
+                  ComputedFields: never
+                  Insert: {
+                    "confirmada_em"?: string | null,"confirmada_por"?: string | null,"created_at"?: string,"created_by"?: string | null,"fim"?: never,"id"?: string,"iniciada_em"?: string | null,"iniciada_por"?: string | null,"inicio": string,"observacoes"?: string | null,"publicada_em"?: string | null,"publicada_por"?: string | null,"revisada_em"?: string | null,"revisada_por"?: string | null,"status"?: Database["public"]['Enums']["status_semana"],"updated_at"?: string
+                  }
+                  Update: {
+                    "confirmada_em"?: string | null,"confirmada_por"?: string | null,"created_at"?: string,"created_by"?: string | null,"fim"?: never,"id"?: string,"iniciada_em"?: string | null,"iniciada_por"?: string | null,"inicio"?: string,"observacoes"?: string | null,"publicada_em"?: string | null,"publicada_por"?: string | null,"revisada_em"?: string | null,"revisada_por"?: string | null,"status"?: Database["public"]['Enums']["status_semana"],"updated_at"?: string
+                  }
+                  Relationships: [
+                    {
+      foreignKeyName: "semanas_confirmada_por_fkey"
+      columns: ["confirmada_por"]
+isOneToOne: false
+      referencedRelation: "colaboradores"
+      referencedColumns: ["id"]
+    },{
+      foreignKeyName: "semanas_confirmada_por_fkey"
+      columns: ["confirmada_por"]
+isOneToOne: false
+      referencedRelation: "v_capacidade_colaborador_semana"
+      referencedColumns: ["colaborador_id"]
+    },{
+      foreignKeyName: "semanas_created_by_fkey"
+      columns: ["created_by"]
+isOneToOne: false
+      referencedRelation: "colaboradores"
+      referencedColumns: ["id"]
+    },{
+      foreignKeyName: "semanas_created_by_fkey"
+      columns: ["created_by"]
+isOneToOne: false
+      referencedRelation: "v_capacidade_colaborador_semana"
+      referencedColumns: ["colaborador_id"]
+    },{
+      foreignKeyName: "semanas_iniciada_por_fkey"
+      columns: ["iniciada_por"]
+isOneToOne: false
+      referencedRelation: "colaboradores"
+      referencedColumns: ["id"]
+    },{
+      foreignKeyName: "semanas_iniciada_por_fkey"
+      columns: ["iniciada_por"]
+isOneToOne: false
+      referencedRelation: "v_capacidade_colaborador_semana"
+      referencedColumns: ["colaborador_id"]
+    },{
+      foreignKeyName: "semanas_publicada_por_fkey"
+      columns: ["publicada_por"]
+isOneToOne: false
+      referencedRelation: "colaboradores"
+      referencedColumns: ["id"]
+    },{
+      foreignKeyName: "semanas_publicada_por_fkey"
+      columns: ["publicada_por"]
+isOneToOne: false
+      referencedRelation: "v_capacidade_colaborador_semana"
+      referencedColumns: ["colaborador_id"]
+    },{
+      foreignKeyName: "semanas_revisada_por_fkey"
+      columns: ["revisada_por"]
+isOneToOne: false
+      referencedRelation: "colaboradores"
+      referencedColumns: ["id"]
+    },{
+      foreignKeyName: "semanas_revisada_por_fkey"
+      columns: ["revisada_por"]
+isOneToOne: false
+      referencedRelation: "v_capacidade_colaborador_semana"
+      referencedColumns: ["colaborador_id"]
     }
                   ]
                 }
           }
           Views: {
-            [_ in never]: never
+            "v_capacidade_colaborador_semana": {
+                  Row: {
+                    "capacidade_efetiva": number | null,"colaborador_id": string,"colaborador_nome": string,"excede_capacidade": boolean | null,"horas_dev_semanais": number,"horas_indisponiveis": number | null,"horas_interno": number | null,"horas_planejadas": number | null,"horas_planejado": number | null,"horas_reserva": number | null,"lider_id": string | null,"ocupacao_pct": number | null,"papel": Database["public"]['Enums']["papel"],"semana_id": string,"semana_inicio": string,"semana_status": Database["public"]['Enums']["status_semana"]
+                  }
+                  ComputedFields: never
+                  Relationships: [
+                    {
+      foreignKeyName: "colaboradores_lider_id_fkey"
+      columns: ["lider_id"]
+isOneToOne: false
+      referencedRelation: "colaboradores"
+      referencedColumns: ["id"]
+    },{
+      foreignKeyName: "colaboradores_lider_id_fkey"
+      columns: ["lider_id"]
+isOneToOne: false
+      referencedRelation: "v_capacidade_colaborador_semana"
+      referencedColumns: ["colaborador_id"]
+    }
+                  ]
+                },"v_resumo_semana": {
+                  Row: {
+                    "alerta_interno": boolean | null,"alerta_planejado": boolean | null,"alerta_reserva": boolean | null,"capacidade_total": number | null,"colaboradores_acima_capacidade": number | null,"fim": string | null,"horas_interno": number | null,"horas_planejadas": number | null,"horas_planejado": number | null,"horas_reserva": number | null,"inicio": string,"limite_interno": number | null,"limite_planejado": number | null,"limite_reserva": number | null,"ocupacao_pct": number | null,"pct_interno": number,"pct_planejado": number,"pct_reserva": number,"replanejamentos": number | null,"semana_id": string,"status": Database["public"]['Enums']["status_semana"]
+                  }
+                  ComputedFields: never
+                  Relationships: [
+                    
+                  ]
+                }
           }
           Functions: {
-            "colaborador_atual_id":
+            "alocado_na_demanda":
+{ Args: { "p_demanda_id": string }; Returns: boolean
+                           },
+"alterando_planejamento":
+{ Args: Record<PropertyKey, never>; Returns: boolean
+                           },
+"avancar_semana":
+{ Args: { "p_semana_id": string }; Returns: Database["public"]['Enums']["status_semana"]
+                           },
+"capacidade_efetiva":
+{ Args: { "p_colaborador_id": string,"p_semana_inicio": string }; Returns: number
+                           },
+"colaborador_atual_id":
 { Args: Record<PropertyKey, never>; Returns: string
                            },
 "eh_lider_tecnico_ativo":
 { Args: { "p_colaborador_id": string }; Returns: boolean
+                           },
+"horas_indisponiveis":
+{ Args: { "p_colaborador_id": string,"p_inicio": string }; Returns: number
                            },
 "lidera":
 { Args: { "p_colaborador_id": string }; Returns: boolean
@@ -237,12 +556,18 @@ isOneToOne: false
 "papel_atual":
 { Args: Record<PropertyKey, never>; Returns: Database["public"]['Enums']["papel"]
                            },
+"replanejar_item":
+{ Args: { "p_colaborador_id": string,"p_demanda_id": string,"p_faixa"?: Database["public"]['Enums']["faixa_capacidade"],"p_horas": number,"p_impacto": string,"p_motivo": string,"p_semana_id": string }; Returns: string
+                           },
+"semana_visivel":
+{ Args: { "p_semana_id": string }; Returns: boolean
+                           },
 "tem_papel":
 { Args: { "papeis": (Database["public"]['Enums']["papel"])[] }; Returns: boolean
                            }
           }
           Enums: {
-            "papel": "proprietario"|"lider_tecnico"|"desenvolvedor"|"administrativo","periodicidade_horas": "total"|"mensal","prioridade": "p1"|"p2"|"p3"|"p4","senioridade": "junior"|"pleno"|"senior"|"especialista","status_contrato": "ativo"|"suspenso"|"encerrado","status_demanda": "nova"|"priorizada"|"planejada"|"em_execucao"|"bloqueada"|"concluida"|"cancelada","status_projeto": "nao_iniciado"|"em_descoberta"|"planejamento"|"em_execucao"|"em_homologacao"|"bloqueado"|"concluido"|"cancelado","tipo_contrato": "banco_horas"|"escopo_fechado"|"sustentacao"|"outro","tipo_demanda": "demanda"|"urgencia"|"correcao"|"atividade_interna","tipo_indisponibilidade": "ferias"|"feriado"|"ausencia"|"treinamento"|"outra"
+            "faixa_capacidade": "planejado"|"reserva"|"interno","papel": "proprietario"|"lider_tecnico"|"desenvolvedor"|"administrativo","periodicidade_horas": "total"|"mensal","prioridade": "p1"|"p2"|"p3"|"p4","senioridade": "junior"|"pleno"|"senior"|"especialista","status_contrato": "ativo"|"suspenso"|"encerrado","status_demanda": "nova"|"priorizada"|"planejada"|"em_execucao"|"bloqueada"|"concluida"|"cancelada","status_projeto": "nao_iniciado"|"em_descoberta"|"planejamento"|"em_execucao"|"em_homologacao"|"bloqueado"|"concluido"|"cancelado","status_semana": "rascunho"|"publicada"|"confirmada"|"em_execucao"|"revisada","tipo_contrato": "banco_horas"|"escopo_fechado"|"sustentacao"|"outro","tipo_demanda": "demanda"|"urgencia"|"correcao"|"atividade_interna","tipo_indisponibilidade": "ferias"|"feriado"|"ausencia"|"treinamento"|"outra","tipo_replanejamento": "inclusao"|"alteracao_horas"|"remocao"|"entrada_p1_p2"|"outro"
           }
           CompositeTypes: {
             [_ in never]: never
@@ -358,7 +683,7 @@ export type CompositeTypes<
 export const Constants = {
   "public": {
           Enums: {
-            "papel": ["proprietario", "lider_tecnico", "desenvolvedor", "administrativo"],"periodicidade_horas": ["total", "mensal"],"prioridade": ["p1", "p2", "p3", "p4"],"senioridade": ["junior", "pleno", "senior", "especialista"],"status_contrato": ["ativo", "suspenso", "encerrado"],"status_demanda": ["nova", "priorizada", "planejada", "em_execucao", "bloqueada", "concluida", "cancelada"],"status_projeto": ["nao_iniciado", "em_descoberta", "planejamento", "em_execucao", "em_homologacao", "bloqueado", "concluido", "cancelado"],"tipo_contrato": ["banco_horas", "escopo_fechado", "sustentacao", "outro"],"tipo_demanda": ["demanda", "urgencia", "correcao", "atividade_interna"],"tipo_indisponibilidade": ["ferias", "feriado", "ausencia", "treinamento", "outra"]
+            "faixa_capacidade": ["planejado", "reserva", "interno"],"papel": ["proprietario", "lider_tecnico", "desenvolvedor", "administrativo"],"periodicidade_horas": ["total", "mensal"],"prioridade": ["p1", "p2", "p3", "p4"],"senioridade": ["junior", "pleno", "senior", "especialista"],"status_contrato": ["ativo", "suspenso", "encerrado"],"status_demanda": ["nova", "priorizada", "planejada", "em_execucao", "bloqueada", "concluida", "cancelada"],"status_projeto": ["nao_iniciado", "em_descoberta", "planejamento", "em_execucao", "em_homologacao", "bloqueado", "concluido", "cancelado"],"status_semana": ["rascunho", "publicada", "confirmada", "em_execucao", "revisada"],"tipo_contrato": ["banco_horas", "escopo_fechado", "sustentacao", "outro"],"tipo_demanda": ["demanda", "urgencia", "correcao", "atividade_interna"],"tipo_indisponibilidade": ["ferias", "feriado", "ausencia", "treinamento", "outra"],"tipo_replanejamento": ["inclusao", "alteracao_horas", "remocao", "entrada_p1_p2", "outro"]
           }
         }
 } as const
