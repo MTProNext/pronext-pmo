@@ -12,6 +12,10 @@ export const PERMISSOES = {
   editarIndisponibilidades: ["proprietario", "lider_tecnico", "administrativo"],
   editarDemandas: ["proprietario", "lider_tecnico"],
   planejarSemana: ["lider_tecnico"],
+  apontarHoras: ["desenvolvedor", "lider_tecnico"],
+  aprovarHoras: ["lider_tecnico", "proprietario"],
+  validarClassificacao: ["administrativo", "proprietario"],
+  editarCategorias: ["proprietario", "lider_tecnico"],
   editarFaixasEAlertas: ["proprietario", "lider_tecnico"],
   editarFechamento: ["proprietario", "administrativo"],
 } satisfies Record<string, Papel[]>;

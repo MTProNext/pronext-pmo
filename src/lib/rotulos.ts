@@ -93,6 +93,39 @@ export const TIPO_REPLANEJAMENTO_LABEL: Record<Enums<"tipo_replanejamento">, str
   outro: "Outro",
 };
 
+export const STATUS_APONTAMENTO_LABEL: Record<Enums<"status_apontamento">, string> = {
+  rascunho: "Rascunho",
+  enviado: "Enviado",
+  aprovado: "Aprovado",
+  devolvido: "Devolvido",
+};
+
+export const CLASSIFICACAO_LABEL: Record<Enums<"classificacao_comercial">, string> = {
+  banco_horas: "Banco de horas",
+  faturavel_adicional: "Serviço faturável adicional",
+  escopo_projeto: "Escopo de projeto",
+  nao_faturavel: "Não faturável",
+  a_validar: "A validar",
+};
+
+/** Situação de prazo das views v_prazo_apontamento_dia/semana. */
+export type SituacaoPrazo = "no_prazo" | "atrasado" | "pendente";
+export const SITUACAO_PRAZO_LABEL: Record<SituacaoPrazo, string> = {
+  no_prazo: "No prazo",
+  atrasado: "Atrasado",
+  pendente: "Pendente",
+};
+
+export const DIA_SEMANA_LABEL: Record<number, string> = {
+  1: "Segunda-feira",
+  2: "Terça-feira",
+  3: "Quarta-feira",
+  4: "Quinta-feira",
+  5: "Sexta-feira",
+  6: "Sábado",
+  7: "Domingo",
+};
+
 /** Converte um mapa de rótulos em opções para Select. */
 export const opcoesDe = (rotulos: Record<string, string>) =>
   Object.entries(rotulos).map(([valor, rotulo]) => ({ valor, rotulo }));

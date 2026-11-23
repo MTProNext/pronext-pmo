@@ -7,7 +7,9 @@ import { Pagina } from "@/components/comum/Pagina";
 import { SecaoCard } from "@/components/comum/SecaoCard";
 import { Selo } from "@/components/comum/Selo";
 import { TabelaDados } from "@/components/comum/TabelaDados";
+import { AvisoDiasSemHoras } from "@/components/minhaSemana/AvisoDiasSemHoras";
 import { colunasMinhaSemana } from "@/components/minhaSemana/colunasMinhaSemana";
+import { useApontamentosSemana } from "@/hooks/useApontamentos";
 import { NavegacaoSemana } from "@/components/planejamento/NavegacaoSemana";
 import { useCapacidadeSemana, useItensSemana, useSemana } from "@/hooks/usePlanejamento";
 import { useSessao } from "@/hooks/useSessao";
@@ -25,9 +27,19 @@ const MinhaSemana = () => {
   const { data: capacidades } = useCapacidadeSemana(semana?.id);
   const { data: itens, isLoading: carregandoItens } = useItensSemana(semana?.id);
 
+  const { data: apontamentos } = useApontamentosSemana(colaborador?.id, inicio);
+
   const minha = capacidades?.find((c) => c.colaborador_id === colaborador?.id);
   const meusItens = useMemo(() => itens?.filter((i) => i.colaborador_id === colaborador?.id), [itens, colaborador]);
-  const colunas = useMemo(() => colunasMinhaSemana(semana?.status !== "revisada"), [semana?.status]);
+  const apontadoPorDemanda = useMemo(() => {
+    const mapa = new Map<string, number>();
+    for (const a of apontamentos ?? []) mapa.set(a.demanda_id, (mapa.get(a.demanda_id) ?? 0) + Number(a.horas));
+    return mapa;
+  }, [apontamentos]);
+  const colunas = useMemo(
+    () => colunasMinhaSemana(semana?.status !== "revisada", apontadoPorDemanda),
+    [semana?.status, apontadoPorDemanda],
+  );
 
   const capacidade = Number(minha?.capacidade_efetiva ?? 0);
   const planejado = Number(minha?.horas_planejadas ?? 0);
@@ -38,6 +50,7 @@ const MinhaSemana = () => {
       descricao={`Sua programação de ${formatSemana(inicio)}`}
       acoes={<NavegacaoSemana inicio={inicio} onChange={setInicio} />}
     >
+      {colaborador && <AvisoDiasSemHoras colaboradorId={colaborador.id} />}
       {isLoading && <Skeleton className="h-64 w-full" />}
       {!isLoading && !semana && (
         <SecaoCard>

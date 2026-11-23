@@ -1,5 +1,9 @@
 import type { Enums } from "@/integrations/supabase/types";
 import {
+  CLASSIFICACAO_LABEL,
+  SITUACAO_PRAZO_LABEL,
+  STATUS_APONTAMENTO_LABEL,
+  type SituacaoPrazo,
   FAIXA_LABEL,
   PRIORIDADE_LABEL,
   STATUS_SEMANA_LABEL,
@@ -70,6 +74,29 @@ export const SELO_STATUS_SEMANA: MapaSelos<Enums<"status_semana">> = {
   confirmada: { rotulo: S.confirmada, variante: "secondary" },
   em_execucao: { rotulo: S.em_execucao, variante: "default" },
   revisada: { rotulo: S.revisada, variante: "outline" },
+};
+
+const A = STATUS_APONTAMENTO_LABEL;
+export const SELO_STATUS_APONTAMENTO: MapaSelos<Enums<"status_apontamento">> = {
+  rascunho: { rotulo: A.rascunho, variante: "outline" },
+  enviado: { rotulo: A.enviado, variante: "secondary" },
+  aprovado: { rotulo: A.aprovado, variante: "default" },
+  devolvido: { rotulo: A.devolvido, variante: "destructive" },
+};
+
+const CL = CLASSIFICACAO_LABEL;
+export const SELO_CLASSIFICACAO: MapaSelos<Enums<"classificacao_comercial">> = {
+  banco_horas: { rotulo: CL.banco_horas, variante: "secondary" },
+  faturavel_adicional: { rotulo: CL.faturavel_adicional, variante: "secondary" },
+  escopo_projeto: { rotulo: CL.escopo_projeto, variante: "secondary" },
+  nao_faturavel: { rotulo: CL.nao_faturavel, variante: "secondary" },
+  a_validar: { rotulo: CL.a_validar, variante: "outline" },
+};
+
+export const SELO_SITUACAO_PRAZO: MapaSelos<SituacaoPrazo> = {
+  no_prazo: { rotulo: SITUACAO_PRAZO_LABEL.no_prazo, variante: "secondary" },
+  atrasado: { rotulo: SITUACAO_PRAZO_LABEL.atrasado, variante: "destructive" },
+  pendente: { rotulo: SITUACAO_PRAZO_LABEL.pendente, variante: "outline" },
 };
 
 const F = FAIXA_LABEL;

@@ -1,7 +1,9 @@
 import { Skeleton } from "@/components/ui/skeleton";
 import { Pagina } from "@/components/comum/Pagina";
 import { FormFaixasAlertas } from "@/components/configuracoes/FormFaixasAlertas";
+import { CardCategorias } from "@/components/configuracoes/CardCategorias";
 import { FormFechamento } from "@/components/configuracoes/FormFechamento";
+import { FormPrazos } from "@/components/configuracoes/FormPrazos";
 import { useConfiguracoes } from "@/hooks/useConfiguracoes";
 import { usePermissao } from "@/hooks/usePermissao";
 
@@ -9,6 +11,7 @@ const Configuracoes = () => {
   const { data: config, isLoading, error } = useConfiguracoes();
   const podeFaixas = usePermissao("editarFaixasEAlertas");
   const podeFechamento = usePermissao("editarFechamento");
+  const podeCategorias = usePermissao("editarCategorias");
 
   return (
     <Pagina titulo="Configurações" descricao="Parâmetros globais do PMO.">
@@ -22,6 +25,8 @@ const Configuracoes = () => {
       {config && (
         <div className="space-y-6">
           <FormFaixasAlertas config={config} podeEditar={podeFaixas} />
+          <FormPrazos config={config} podeEditar={podeFaixas} />
+          <CardCategorias podeEditar={podeCategorias} />
           <FormFechamento config={config} podeEditar={podeFechamento} />
         </div>
       )}

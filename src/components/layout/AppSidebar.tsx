@@ -8,10 +8,13 @@ import {
   SidebarGroupLabel,
   SidebarHeader,
   SidebarMenu,
+  SidebarMenuBadge,
   SidebarMenuButton,
   SidebarMenuItem,
   SidebarRail,
 } from "@/components/ui/sidebar";
+import { useContagemPendentes } from "@/hooks/useAprovacoes";
+import { usePermissao } from "@/hooks/usePermissao";
 import { useSessao } from "@/hooks/useSessao";
 import { NAVEGACAO } from "./navegacao";
 
@@ -19,6 +22,8 @@ import { NAVEGACAO } from "./navegacao";
 export function AppSidebar() {
   const { colaborador } = useSessao();
   const { pathname } = useLocation();
+  const podeAprovar = usePermissao("aprovarHoras");
+  const { data: pendentes } = useContagemPendentes(podeAprovar);
   if (!colaborador) return null;
 
   const grupos = NAVEGACAO.map((g) => ({
@@ -63,6 +68,9 @@ export function AppSidebar() {
                         <span>{item.titulo}</span>
                       </NavLink>
                     </SidebarMenuButton>
+                    {item.rota === "/aprovacoes" && !!pendentes && (
+                      <SidebarMenuBadge aria-label={`${pendentes} aguardando aprovação`}>{pendentes}</SidebarMenuBadge>
+                    )}
                   </SidebarMenuItem>
                 ))}
               </SidebarMenu>

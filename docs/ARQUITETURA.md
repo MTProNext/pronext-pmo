@@ -19,6 +19,10 @@ Documento vivo: atualizado a cada etapa. Serve de contexto para o Lovable e o Cl
   automáticos pendentes até o líder completar motivo e impacto.
 - **Fase 1, etapa 4B (planejamento: telas)**: concluída. Grade da semana, ciclo de vida,
   replanejamento, aviso de pendentes, log da semana e "Minha semana". **Fase 1 completa.**
+- **Fase 2, etapa 2A (apontamento de horas)**: concluída. Categorias, apontamentos,
+  auditoria, fluxo rascunho → enviado → aprovado/devolvido, classificação comercial,
+  horas não planejadas, prazos de registro/envio e telas `/apontamentos`, `/aprovacoes`,
+  `/horas/classificacao`. Próximas: 2B (ficha de projeto) e 2C (riscos e impedimentos).
 
 ## Stack
 - Vite 5 + React 18 + TypeScript (SPA), plugin `@vitejs/plugin-react-swc`
@@ -37,7 +41,8 @@ src/
   components/layout/      # AppLayout, AppSidebar, navegacao.ts
   components/<modulo>/    # colunas<Modulo>.tsx e Formulario<Modulo>.tsx por módulo
                           # (colaboradores, clientes, contratos, projetos, indisponibilidades,
-                          #  configuracoes)
+                          #  configuracoes, backlog, planejamento, minhaSemana, apontamentos,
+                          #  aprovacoes)
   pages/                  # uma página por rota (pages/cadastros/ para cadastros)
   hooks/                  # useSessao, usePermissao, useMutacao e um hook por recurso
   integrations/supabase/  # client.ts e types.ts (gerado por npm run db:types)
@@ -62,6 +67,9 @@ supabase/
   UTC e, depois das 21h de Brasília, já seria o dia seguinte. Vale para as próximas fases
   (prazo de apontamento, fechamento mensal, projetos sem atualização...). Em testes, o
   instante pode ser simulado com `set_config('pmo.agora', '<timestamptz>', true)`.
+- **"Agora" é sempre `public.agora()`** em regras de prazo e em carimbos de fluxo
+  (`enviado_em`, `aprovado_em`...), no lugar de `now()`: mesma simulação por `pmo.agora`.
+  `hoje_brasil()` usa `agora()`. Prazos com hora são calculados em America/Sao_Paulo.
 - Nomes em português, `snake_case`, sem acento.
 - `id uuid`, `created_at`, `updated_at` (trigger `set_updated_at`).
 - Nada é excluído quando há histórico: usa-se `ativo = false` ou status `cancelada`.
@@ -213,7 +221,73 @@ Triggers adicionados na etapa 4A:
 Semanas 16/11/2026 (revisada, feriado 20/11), 23/11/2026 (em execução, com treinamento de
 meio período do Rafael, ausência da Juliana e meio período da Fernanda) e 30/11/2026
 (rascunho, Diego acima da capacidade por causa do treinamento). Quatro replanejamentos de
-exemplo nas semanas publicadas e um pendente (DEM-0014, P1 que entrou em 24/11).
+exemplo nas semanas publicadas e um pendente (DEM-0014, P1 que entrou em 23/11).
+
+### Apontamento de horas (Fase 2A)
+
+**Enums:** `status_apontamento` (rascunho, enviado, aprovado, devolvido);
+`classificacao_comercial` (banco_horas, faturavel_adicional, escopo_projeto, nao_faturavel,
+a_validar).
+
+**`configuracoes` (novas colunas):** `prazo_registro_dias_uteis` (1),
+`prazo_envio_dia_semana` (1 = segunda da semana seguinte), `prazo_envio_hora` (12:00,
+Brasília), `inicio_controle_apontamentos` (nulo = controle desligado; seed = 09/11/2026).
+Editáveis por Proprietário e Líder (bloco "faixas, alertas e prazos" do trigger de guarda).
+
+**`categorias_hora`:** `codigo` (estável, usado pelas regras: `correcao`, `gestao`...),
+`nome`, `ordem`, `fora_do_planejamento` (Gestão e Reunião: nunca contam como não
+planejadas), `ativo`. As 8 categorias da seção 5.3 são criadas na migration.
+
+**`apontamentos`:** `colaborador_id` (padrão = usuário), `data`, `demanda_id`
+(obrigatória; atividades internas são demandas `atividade_interna`, ex.: "Gestão do PMO"),
+`cliente_id`/`contrato_id`/`projeto_id` (copiados da demanda por trigger), `categoria_id`,
+`descricao` (**mínimo 10 caracteres**, constraint), `horas` (> 0, ≤ 24),
+`classificacao_comercial` (padrão a_validar), `classificacao_validada_em/por`, `status`,
+`primeiro_envio_em` (base do prazo semanal, não muda em reenvios), `enviado_em`,
+`aprovado_em/por`, `devolvido_em/por`, `motivo_devolucao`, `created_at` (**definido pelo
+banco** = `agora()`; base do prazo diário). Único (colaborador, demanda, data).
+- `apontamentos_guardar`: autor só cria rascunho e só edita/exclui rascunho ou devolvido
+  (data, demanda, categoria, descrição, horas); status, aprovação e classificação só pelas
+  funções; chama `periodo_fechado(data)`.
+- `apontamentos_validar`: data ≤ `hoje_brasil()`, demanda não cancelada, só dev/líder
+  apontam, total do dia ≤ 24h, `created_at` imposto pelo banco.
+- `apontamentos_auditar` → **`apontamentos_auditoria`** (operação, campos alterados,
+  antes/depois em jsonb, motivo, quem, quando). Só leitura.
+
+**Funções:**
+| Função | O que faz |
+|---|---|
+| `pode_aprovar(colaborador, demanda)` | Líder direto do colaborador ou líder da demanda; horas de líder: outro líder ou Proprietário; nunca as próprias |
+| `enviar_apontamentos(ids[])` | Autor: rascunho/devolvido → enviado |
+| `aprovar_apontamentos(ids[], classificacao?, usar_sugestao)` | Aprovador: enviado → aprovado; aplica a classificação informada ou a sugestão (não mexe em classificação já validada) |
+| `devolver_apontamento(id, motivo)` | Aprovador: enviado → devolvido (motivo na auditoria) |
+| `reabrir_apontamento(id, motivo)` | Aprovador: aprovado → devolvido (motivo na auditoria) |
+| `classificar_apontamentos(ids[], classificacao, validar)` | Líder sugere (enviados/aprovados que aprova, não validados); Adm./Prop. classificam e validam aprovados |
+| `classificacao_sugerida(demanda)` | Interna → não faturável; banco de horas/sustentação → banco de horas; escopo fechado ou projeto → escopo de projeto; senão a validar |
+| `periodo_fechado(data)` | Gancho do fechamento mensal (Fase 3); hoje sempre `false` |
+| `horas_indisponiveis_dia`, `eh_dia_util` | Dia útil = seg–sex sem indisponibilidade de dia inteiro (feriado, férias...) |
+| `prazo_registro(colaborador, dia)` | Fim (Brasília) do N-ésimo dia útil seguinte da pessoa |
+| `prazo_envio_semana(segunda)` | Dia/hora configurados da semana seguinte |
+| `agora()` | Instante atual (simulável em testes) |
+
+**Views:**
+- `v_apontamentos`: apontamento + nomes, `semana_inicio`, `horas_planejadas_semana`,
+  **`nao_planejada`** (sem alocação da pessoa na demanda em semana publicada ou posterior,
+  e categoria não "fora do planejamento"; calculado ao vivo), `pode_aprovar`,
+  `classificacao_sugerida`.
+- `v_horas_semana_colaborador`: por pessoa/semana: apontado, rascunho, enviado, aprovado,
+  devolvido, não planejado e planejado.
+- `v_prazo_apontamento_dia`: cada dia útil (desde o início do controle até hoje) de cada
+  pessoa: primeiro registro, prazo e situação `no_prazo` / `atrasado` / `pendente`.
+- `v_prazo_apontamento_semana`: por pessoa/semana: dias no prazo/atrasados/sem registro,
+  `enviada` (já chegou à sexta, todo dia útil tem registro e tudo foi enviado ao menos uma
+  vez), `enviada_em` (último primeiro envio), prazo e situação.
+- Nas duas views de prazo: Proprietário e Líder veem todos; os demais, só a própria linha.
+
+**Seed 2A:** semana 09/11 (revisada, plano cumprido, tudo no prazo e validado), 16/11
+(8h não planejadas; Fernanda e Thiago com dias atrasados; Diego sem registro em 19/11 e
+semana atrasada; Juliana enviou às 13h; um aprovado reaberto) e 23/11 (rascunhos,
+enviados e um devolvido). Demandas internas "Gestão do PMO" e "Reuniões e revisões".
 
 ## Perfis e RLS
 
@@ -242,6 +316,9 @@ Usuário autenticado sem colaborador ativo não lê nada. `anon` não lê nada.
 | `semanas` | ler (inclusive rascunho) | ler, criar (rascunho), alterar (status só por função), excluir rascunho | ler publicada ou posterior | ler publicada ou posterior |
 | `planejamento_itens` | ler | ler; criar/alterar/excluir em rascunho; depois só `replanejar_item` | ler os seus (semana publicada ou posterior) | ler (semana publicada ou posterior) |
 | `replanejamentos` | ler | ler (gravação por função) | ler os que o afetam | ler |
+| `categorias_hora` | ler, criar, alterar | ler, criar, alterar | ler | ler |
+| `apontamentos` | ler todos; aprovar horas de líderes; validar classificação | ler todos; criar/alterar/excluir os seus (rascunho/devolvido); aprovar equipe e suas demandas; sugerir classificação | ler, criar, alterar e excluir os seus (rascunho/devolvido) | ler só aprovados; validar classificação |
+| `apontamentos_auditoria` | ler | ler | ler a dos seus | — |
 
 A divisão de colunas em `configuracoes` é garantida pelo trigger `configuracoes_guardar_colunas`.
 Nenhuma tabela de cadastro permite exclusão, exceto `indisponibilidades` e `contratos_valores`;
@@ -301,6 +378,8 @@ regras em todas as telas novas.
 | `CampoSelect` | Select de formulário; com `rotuloNenhum` aceita `null` (ex.: "Sem contrato") |
 | `CampoData` | Popover + Calendar (ptBR); valor `"aaaa-mm-dd"` ou `null` (`opcional` mostra botão limpar) |
 | `Indicador` | Card de indicador: rótulo pequeno, número grande, descrição; `alerta` deixa o número em `text-destructive` |
+| `colunaSelecao()` | Primeira coluna de `TabelaDados` com checkbox por linha e "todos" (ações em lote) |
+| `DialogMotivo` | Dialog com motivo obrigatório (devolver, reabrir, rejeitar...) |
 
 ### Esqueleto de uma tela de lista
 ```tsx
@@ -361,6 +440,26 @@ As colunas ficam em `components/<modulo>/colunas<Modulo>.tsx` para manter a pág
   pessoais e tabela com `StatusRapido` (Planejada, Em execução, Bloqueada, Concluída),
   desabilitado em semana revisada.
 
+### Apontamentos e aprovações (`components/apontamentos`, `components/aprovacoes`)
+- `/apontamentos?semana=`: `ConteudoApontamentos` (remontado por semana) com
+  `GradeApontamentos`: linhas = `montarLinhas()` (planejadas da semana publicada + com horas
+  + incluídas/copiadas), colunas = seg–sex (sábado/domingo por Switch ou se houver horas).
+  Categoria e descrição **na linha** (`LinhaDescricao`, mínimo 10); cada `CelulaHoras` tem
+  input (Tab para o próximo dia, salva ao sair, "1,5" aceito) e ícone de descrição do dia
+  sempre visível (destacado quando o dia tem descrição própria ou foi devolvido), com
+  status, motivo de devolução e histórico (`SheetHistorico`). Enviado/aprovado = célula
+  travada. Dias úteis passados sem horas: coluna com "Sem horas" + Alert no topo; folgas
+  (feriado/férias) com "Folga". Salvamento das células sem toast (`useMutacao` sem
+  `sucesso`).
+- `/aprovacoes`: bloco "Semana não enviada" (semanas encerradas, últimas 4) + abas
+  "Aguardando aprovação" (filtros, seleção em lote, classificação na aprovação, Devolver
+  com `DialogMotivo`) e "Aprovadas recentes" (Reabrir). Contador de pendentes no menu
+  (`SidebarMenuBadge`).
+- `/horas/classificacao`: horas aprovadas não validadas, por cliente/contrato; validar em
+  lote com a classificação atual/sugestão ou outra escolhida.
+- "Minha semana": coluna "Apontado" e Alert de dias úteis sem horas (semana atual e
+  anterior) com "Apontar agora".
+
 ### Selos (`src/lib/selos.ts`)
 Só variantes do `Badge`, com cores discretas:
 
@@ -372,8 +471,10 @@ Só variantes do `Badge`, com cores discretas:
 | `outline` | neutro, inicial ou encerrado | P4 · Baixa, Nova, Cancelada, Rascunho, Revisada, Inativo |
 
 Mapas já definidos (todos tipados com `Enums<>`): `SELO_SITUACAO`, `SELO_STATUS_CONTRATO`,
-`SELO_STATUS_PROJETO`, `SELO_PRIORIDADE`, `SELO_STATUS_DEMANDA`, `SELO_STATUS_SEMANA` e
-`SELO_FAIXA`. Estimativa nula aparece como Badge `outline`
+`SELO_STATUS_PROJETO`, `SELO_PRIORIDADE`, `SELO_STATUS_DEMANDA`, `SELO_STATUS_SEMANA`,
+`SELO_FAIXA`, `SELO_STATUS_APONTAMENTO` (devolvido = `destructive`, aprovado = `default`),
+`SELO_CLASSIFICACAO` (a validar = `outline`) e `SELO_SITUACAO_PRAZO` (atrasado =
+`destructive`). Estimativa nula aparece como Badge `outline`
 "A definir" (`components/backlog/Estimativa.tsx`). Contrato suspenso usa `default`;
 projeto bloqueado usa `destructive`.
 
@@ -390,6 +491,9 @@ projeto bloqueado usa `destructive`.
 | `/planejamento/:inicio/replanejamentos` | `ReplanejamentosSemana` (log; completar pendentes) | idem |
 | `/backlog` | `Backlog` (lista; filtro padrão "Em aberto") | todos (dev e adm só leem) |
 | `/backlog/:id` | `DemandaDetalhe` (editar e mudar status: líder e proprietário) | todos |
+| `/apontamentos?semana=` | `Apontamentos` (grade semanal das próprias horas) | dev, líder |
+| `/aprovacoes` | `Aprovacoes` (semana não enviada, aprovar/devolver/reabrir) | líder, proprietário |
+| `/horas/classificacao` | `ClassificacaoHoras` (validação comercial) | administrativo, proprietário |
 | `/cadastros/colaboradores` | `Colaboradores` (somente leitura) | proprietário, administrativo, líder |
 | `/cadastros/clientes` | `Clientes` | proprietário, administrativo, líder |
 | `/cadastros/contratos` | `Contratos` (líder só lê; valor/hora só prop. e adm.) | proprietário, administrativo, líder |
@@ -405,6 +509,13 @@ Os papéis de cada rota vêm de `src/components/layout/navegacao.ts`, que també
 menu. Esse controle é só de interface; a segurança está na RLS.
 
 ## Decisões técnicas
+- Apontamento (2A): "primeiro registro do dia" = menor `created_at` entre os apontamentos
+  da pessoa naquele dia (apontamento excluído deixa de contar). Semana "enviada" só a partir
+  da sexta e com todos os dias úteis registrados; reenvio após devolução não muda o
+  `primeiro_envio_em`. Dia útil com indisponibilidade parcial (meio período) continua
+  exigindo registro.
+- `traduzirErro`: recusas da RLS (inglês) viram "sem permissão"; mensagens de funções e
+  triggers (já em pt-BR) são mostradas como vieram.
 - shadcn CLI fixado em 2.3.0 (última versão compatível com Tailwind 3).
 - `toast`/`toaster` do shadcn não incluídos: notificações via `sonner`.
 - `react-resizable-panels@2` e `react-day-picker@9` fixados para compatibilidade

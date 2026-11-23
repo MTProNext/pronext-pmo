@@ -7,6 +7,9 @@ import { AppLayout } from "@/components/layout/AppLayout";
 import { papeisDaRota } from "@/components/layout/navegacao";
 import { SessaoProvider } from "@/hooks/useSessao";
 import AcessoNaoConfigurado from "@/pages/AcessoNaoConfigurado";
+import Apontamentos from "@/pages/Apontamentos";
+import Aprovacoes from "@/pages/Aprovacoes";
+import ClassificacaoHoras from "@/pages/ClassificacaoHoras";
 import Backlog from "@/pages/Backlog";
 import Clientes from "@/pages/cadastros/Clientes";
 import Colaboradores from "@/pages/cadastros/Colaboradores";
@@ -41,6 +44,9 @@ const ROTAS: { caminho: string; pagina: JSX.Element; menu?: string }[] = [
     menu: "/planejamento",
   },
   { caminho: "/backlog", pagina: <Backlog /> },
+  { caminho: "/apontamentos", pagina: <Apontamentos /> },
+  { caminho: "/aprovacoes", pagina: <Aprovacoes /> },
+  { caminho: "/horas/classificacao", pagina: <ClassificacaoHoras /> },
   { caminho: "/backlog/:id", pagina: <DemandaDetalhe />, menu: "/backlog" },
   { caminho: "/cadastros/colaboradores", pagina: <Colaboradores /> },
   { caminho: "/cadastros/clientes", pagina: <Clientes /> },

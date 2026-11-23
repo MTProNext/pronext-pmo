@@ -9,8 +9,11 @@ import { StatusRapido } from "./StatusRapido";
 const origem = (i: ItemPlanejamento) =>
   i.demanda?.cliente ? [i.demanda.cliente.nome, i.demanda.projeto?.nome].filter(Boolean).join(" · ") : "Interno";
 
-/** Colunas de "Minha semana"; o status só é editável enquanto a semana não foi revisada. */
-export function colunasMinhaSemana(statusEditavel: boolean): Coluna<ItemPlanejamento>[] {
+/**
+ * Colunas de "Minha semana"; o status só é editável enquanto a semana não foi revisada.
+ * `apontado`: horas apontadas pela pessoa por demanda na semana.
+ */
+export function colunasMinhaSemana(statusEditavel: boolean, apontado: Map<string, number>): Coluna<ItemPlanejamento>[] {
   return [
     {
       chave: "demanda",
@@ -39,6 +42,15 @@ export function colunasMinhaSemana(statusEditavel: boolean): Coluna<ItemPlanejam
       titulo: "Horas planejadas",
       alinhamento: "direita",
       celula: (i) => formatHours(Number(i.horas_planejadas)),
+    },
+    {
+      chave: "apontado",
+      titulo: "Apontado",
+      alinhamento: "direita",
+      celula: (i) => {
+        const horas = apontado.get(i.demanda_id) ?? 0;
+        return horas ? formatHours(horas) : <span className="text-muted-foreground">—</span>;
+      },
     },
     {
       chave: "status",

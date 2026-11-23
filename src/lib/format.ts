@@ -1,4 +1,4 @@
-import { format, parseISO } from "date-fns";
+import { addDays, format, parseISO } from "date-fns";
 import { ptBR } from "date-fns/locale";
 
 /** Converte "aaaa-mm-dd" (data do banco) em Date no fuso local, sem deslocar o dia. */
@@ -9,6 +9,9 @@ export const formatDate = (data: Date | string) => format(parseData(data), "dd/M
 
 /** Date → "aaaa-mm-dd" para gravar no banco. */
 export const paraDataISO = (data: Date) => format(data, "yyyy-MM-dd");
+
+/** Soma dias a uma data "aaaa-mm-dd". */
+export const addDaysISO = (data: string, dias: number) => paraDataISO(addDays(parseData(data), dias));
 
 /** Período "dd/mm/aaaa a dd/mm/aaaa" (ou uma data só, se iguais; "desde ..." sem fim). */
 export const formatPeriodo = (inicio: string, fim: string | null) => {
@@ -23,6 +26,13 @@ export const formatHours = (hours: number) =>
 
 /** Número com vírgula decimal, sem unidade (ex.: 20,8). Usado em grades compactas. */
 export const formatNumero = (n: number) => n.toLocaleString("pt-BR", { maximumFractionDigits: 2 });
+
+/** Lê horas digitadas ("1,5", "1.5", "2"). Vazio = null; inválido = NaN. */
+export const lerHoras = (texto: string): number | null => {
+  const limpo = texto.trim().replace(",", ".");
+  if (limpo === "") return null;
+  return /^\d+(\.\d+)?$/.test(limpo) ? Number(limpo) : Number.NaN;
+};
 
 /** Percentual, ex.: 85,8%. */
 export const formatPct = (n: number | null) =>

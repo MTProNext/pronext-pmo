@@ -5,8 +5,8 @@ import { traduzirErro } from "@/lib/erros";
 interface Opcoes {
   /** Queries a recarregar após o sucesso. */
   invalidar: QueryKey[];
-  /** Mensagem do toast de sucesso. */
-  sucesso: string;
+  /** Mensagem do toast de sucesso. Omitida = sem toast (ex.: salvamento automático). */
+  sucesso?: string;
 }
 
 /** Mutação padrão: toast de sucesso/erro (traduzido) e invalidação das queries. */
@@ -20,7 +20,7 @@ export function useMutacao<TVariaveis>(
     mutationFn: executar,
     onSuccess: () => {
       invalidar.forEach((queryKey) => queryClient.invalidateQueries({ queryKey }));
-      toast.success(sucesso);
+      if (sucesso) toast.success(sucesso);
     },
     onError: (erro: { code?: string; message: string }) => {
       toast.error(traduzirErro(erro));

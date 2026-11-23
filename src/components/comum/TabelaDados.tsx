@@ -13,7 +13,7 @@ import { EstadoVazio } from "./EstadoVazio";
 
 export interface Coluna<T> {
   chave: string;
-  titulo: string;
+  titulo: ReactNode;
   celula: (linha: T) => ReactNode;
   alinhamento?: "esquerda" | "direita" | "centro";
   className?: string;

@@ -216,7 +216,7 @@ values
   ('00000000-0000-4000-f000-000000000014', 'Falha no envio de pedidos ao ERP',
    'Pedidos aprovados não chegam ao ERP desde a atualização de ontem.',
    '00000000-0000-4000-c000-000000000002', '00000000-0000-4000-e000-000000000001',
-   'Otávio Reis', '2026-11-24', 'p1', '00000000-0000-4000-a000-000000000011', null, 'nova', 'urgencia');
+   'Otávio Reis', '2026-11-23', 'p1', '00000000-0000-4000-a000-000000000011', null, 'nova', 'urgencia');
 
 -- Semanas
 insert into public.semanas
@@ -310,4 +310,196 @@ insert into public.replanejamentos
 values
   ('00000000-0000-4000-9000-000000000002', 'entrada_p1_p2', '00000000-0000-4000-f000-000000000014', true,
    'Entrada de demanda P1 · Crítica durante a semana. Líder avalia na hora e define a resposta.',
-   '00000000-0000-4000-a000-000000000011', '2026-11-24 09:10-03');
+   '00000000-0000-4000-a000-000000000011', '2026-11-23 10:10-03');
+
+-- =============================================================================
+-- Fase 2, etapa 2A: apontamentos de horas
+-- Semanas 09/11 (plano cumprido, tudo no prazo e validado), 16/11 (exceções para
+-- conferência: horas não planejadas, registros e envios fora do prazo, dia sem
+-- registro, um aprovado reaberto) e 23/11 (rascunhos, enviados e um devolvido).
+-- =============================================================================
+update public.configuracoes set inicio_controle_apontamentos = '2026-11-09';
+
+-- Demandas internas permanentes para as horas de gestão e reuniões dos líderes
+insert into public.demandas
+  (id, titulo, descricao, solicitante, data_entrada, prioridade, lider_id, status, tipo)
+values
+  ('00000000-0000-4000-f000-000000000015', 'Gestão do PMO',
+   'Planejamento semanal, aprovação de horas e acompanhamento de projetos.', 'PMO', '2026-11-02', 'p3',
+   '00000000-0000-4000-a000-000000000011', 'em_execucao', 'atividade_interna'),
+  ('00000000-0000-4000-f000-000000000016', 'Reuniões e revisões',
+   'Reuniões de equipe e revisões de código e arquitetura.', 'PMO', '2026-11-02', 'p3',
+   '00000000-0000-4000-a000-000000000012', 'em_execucao', 'atividade_interna');
+
+-- Semana de 09/11 (revisada) e seu planejamento
+insert into public.semanas
+  (id, inicio, status, publicada_em, publicada_por, confirmada_em, confirmada_por,
+   iniciada_em, iniciada_por, revisada_em, revisada_por, observacoes)
+values
+  ('00000000-0000-4000-9000-000000000009', '2026-11-09', 'revisada',
+   '2026-11-06 17:00-03', '00000000-0000-4000-a000-000000000011',
+   '2026-11-09 09:00-03', '00000000-0000-4000-a000-000000000011',
+   '2026-11-09 09:30-03', '00000000-0000-4000-a000-000000000011',
+   '2026-11-13 16:00-03', '00000000-0000-4000-a000-000000000011',
+   'Semana cheia; plano cumprido.');
+
+insert into public.planejamento_itens (semana_id, colaborador_id, demanda_id, horas_planejadas, faixa) values
+  ('00000000-0000-4000-9000-000000000009', '00000000-0000-4000-a000-000000000021', '00000000-0000-4000-f000-000000000001', 30, 'planejado'),
+  ('00000000-0000-4000-9000-000000000009', '00000000-0000-4000-a000-000000000021', '00000000-0000-4000-f000-000000000002', 10, 'planejado'),
+  ('00000000-0000-4000-9000-000000000009', '00000000-0000-4000-a000-000000000022', '00000000-0000-4000-f000-000000000001', 25, 'planejado'),
+  ('00000000-0000-4000-9000-000000000009', '00000000-0000-4000-a000-000000000022', '00000000-0000-4000-f000-000000000002', 10, 'planejado'),
+  ('00000000-0000-4000-9000-000000000009', '00000000-0000-4000-a000-000000000023', '00000000-0000-4000-f000-000000000002', 35, 'planejado'),
+  ('00000000-0000-4000-9000-000000000009', '00000000-0000-4000-a000-000000000024', '00000000-0000-4000-f000-000000000006', 30, 'planejado'),
+  ('00000000-0000-4000-9000-000000000009', '00000000-0000-4000-a000-000000000024', '00000000-0000-4000-f000-000000000008', 5,  'planejado'),
+  ('00000000-0000-4000-9000-000000000009', '00000000-0000-4000-a000-000000000025', '00000000-0000-4000-f000-000000000006', 25, 'planejado'),
+  ('00000000-0000-4000-9000-000000000009', '00000000-0000-4000-a000-000000000025', '00000000-0000-4000-f000-000000000009', 5,  'reserva'),
+  ('00000000-0000-4000-9000-000000000009', '00000000-0000-4000-a000-000000000011', '00000000-0000-4000-f000-000000000001', 15, 'planejado'),
+  ('00000000-0000-4000-9000-000000000009', '00000000-0000-4000-a000-000000000011', '00000000-0000-4000-f000-000000000011', 5,  'interno'),
+  ('00000000-0000-4000-9000-000000000009', '00000000-0000-4000-a000-000000000012', '00000000-0000-4000-f000-000000000008', 15, 'planejado'),
+  ('00000000-0000-4000-9000-000000000009', '00000000-0000-4000-a000-000000000012', '00000000-0000-4000-f000-000000000012', 5,  'interno');
+
+-- Apontamentos que seguem o planejamento de 09/11 e 16/11: as horas de cada item
+-- divididas igualmente pelos dias úteis da pessoa, registradas no próprio dia às 18h.
+insert into public.apontamentos (colaborador_id, data, demanda_id, categoria_id, descricao, horas, created_at)
+select
+  i.colaborador_id,
+  dia,
+  i.demanda_id,
+  (select c.id from public.categorias_hora c
+    where c.codigo = case when dm.cliente_id is null then 'atividade_interna'
+                          when dm.tipo = 'correcao' then 'correcao'
+                          else 'desenvolvimento' end),
+  'Trabalho em ' || dm.titulo,
+  i.horas_planejadas / cardinality(u.dias),
+  (dia + time '18:00') at time zone 'America/Sao_Paulo'
+from public.planejamento_itens i
+join public.semanas s on s.id = i.semana_id
+join public.demandas dm on dm.id = i.demanda_id
+cross join lateral (
+  select array_agg(x::date order by x) as dias
+  from generate_series(s.inicio::timestamp, (s.inicio + 4)::timestamp, interval '1 day') x
+  where public.eh_dia_util(i.colaborador_id, x::date)
+) u
+cross join lateral unnest(u.dias) as dia
+where s.inicio in ('2026-11-09', '2026-11-16');
+
+-- Gestão (1,5h/dia) e reuniões (2h/dia) dos líderes: categorias fora do planejamento
+insert into public.apontamentos (colaborador_id, data, demanda_id, categoria_id, descricao, horas, created_at)
+select l.id, x::date, t.demanda,
+       (select c.id from public.categorias_hora c where c.codigo = t.categoria),
+       t.descricao, t.horas, (x::date + time '18:00') at time zone 'America/Sao_Paulo'
+from (values ('00000000-0000-4000-a000-000000000011'::uuid), ('00000000-0000-4000-a000-000000000012'::uuid)) l (id)
+cross join (values
+  ('00000000-0000-4000-f000-000000000015'::uuid, 'gestao', 1.5, 'Gestão do PMO: planejamento, aprovações e acompanhamento.'),
+  ('00000000-0000-4000-f000-000000000016'::uuid, 'reuniao', 2.0, 'Reuniões de equipe e revisões técnicas do dia.')
+) t (demanda, categoria, horas, descricao)
+cross join generate_series('2026-11-09'::timestamp, '2026-11-19'::timestamp, interval '1 day') x
+where public.eh_dia_util(l.id, x::date);
+
+-- Exceções da semana de 16/11: horas fora do planejamento
+insert into public.apontamentos (colaborador_id, data, demanda_id, categoria_id, descricao, horas, created_at) values
+  ('00000000-0000-4000-a000-000000000021', '2026-11-18', '00000000-0000-4000-f000-000000000007',
+   (select id from public.categorias_hora where codigo = 'desenvolvimento'),
+   'Ajuste rápido na exportação CSV a pedido do cliente.', 1, '2026-11-18 18:00-03'),
+  ('00000000-0000-4000-a000-000000000022', '2026-11-16', '00000000-0000-4000-f000-000000000005',
+   (select id from public.categorias_hora where codigo = 'correcao'),
+   'Correção no layout da nota fiscal após a entrega.', 2, '2026-11-16 18:00-03'),
+  ('00000000-0000-4000-a000-000000000011', '2026-11-17', '00000000-0000-4000-f000-000000000002',
+   (select id from public.categorias_hora where codigo = 'analise'),
+   'Apoio na definição da API do ERP com o Diego.', 2, '2026-11-17 18:00-03'),
+  ('00000000-0000-4000-a000-000000000012', '2026-11-18', '00000000-0000-4000-f000-000000000004',
+   (select id from public.categorias_hora where codigo = 'analise'),
+   'Análise da urgência P1 do boleto junto com a Aline.', 3, '2026-11-18 18:00-03');
+
+-- Exceções de prazo na semana de 16/11
+delete from public.apontamentos                          -- Diego não registrou 19/11
+ where colaborador_id = '00000000-0000-4000-a000-000000000023' and data = '2026-11-19';
+update public.apontamentos set created_at = '2026-11-19 17:00-03'   -- Thiago registrou 16 a 19/11 só na quinta
+ where colaborador_id = '00000000-0000-4000-a000-000000000025' and data between '2026-11-16' and '2026-11-19';
+update public.apontamentos set created_at = '2026-11-18 10:00-03'   -- Fernanda registrou 16/11 na quarta
+ where colaborador_id = '00000000-0000-4000-a000-000000000022' and data = '2026-11-16';
+
+-- Envio das semanas (primeiro envio = base do prazo semanal: segunda seguinte às 12h)
+update public.apontamentos a
+   set status = 'enviado', primeiro_envio_em = e.em, enviado_em = e.em
+  from (values
+    ('2026-11-09'::date, null::uuid, '2026-11-13 18:00-03'::timestamptz),
+    ('2026-11-16', '00000000-0000-4000-a000-000000000021', '2026-11-19 18:00-03'),
+    ('2026-11-16', '00000000-0000-4000-a000-000000000022', '2026-11-23 10:00-03'),
+    ('2026-11-16', '00000000-0000-4000-a000-000000000023', '2026-11-23 14:00-03'),
+    ('2026-11-16', '00000000-0000-4000-a000-000000000024', '2026-11-19 17:30-03'),
+    ('2026-11-16', '00000000-0000-4000-a000-000000000025', '2026-11-23 11:00-03'),
+    ('2026-11-16', '00000000-0000-4000-a000-000000000011', '2026-11-19 18:00-03'),
+    ('2026-11-16', '00000000-0000-4000-a000-000000000012', '2026-11-23 13:00-03')
+  ) e (semana, colaborador, em)
+ where date_trunc('week', a.data)::date = e.semana
+   and (e.colaborador is null or a.colaborador_id = e.colaborador);
+
+-- Aprovação (líder direto; horas de líder pelo outro líder) com a classificação sugerida
+update public.apontamentos a
+   set status = 'aprovado',
+       aprovado_em = case when a.data < '2026-11-16' then '2026-11-16 15:00-03'::timestamptz
+                          else '2026-11-23 15:30-03'::timestamptz end,
+       aprovado_por = case c.papel
+                        when 'lider_tecnico' then case c.id when '00000000-0000-4000-a000-000000000011'
+                                                    then '00000000-0000-4000-a000-000000000012'::uuid
+                                                    else '00000000-0000-4000-a000-000000000011'::uuid end
+                        else c.lider_id end,
+       classificacao_comercial = public.classificacao_sugerida(a.demanda_id)
+  from public.colaboradores c
+ where c.id = a.colaborador_id and a.status = 'enviado';
+
+-- Classificação comercial validada pelo Administrativo na semana de 09/11
+update public.apontamentos
+   set classificacao_validada_em = '2026-11-17 10:00-03',
+       classificacao_validada_por = '00000000-0000-4000-a000-000000000002'
+ where data < '2026-11-16' and classificacao_comercial <> 'a_validar';
+
+-- Semana atual (23/11): rascunhos, enviados e (abaixo) um devolvido
+insert into public.apontamentos (colaborador_id, data, demanda_id, categoria_id, descricao, horas, created_at) values
+  ('00000000-0000-4000-a000-000000000021', '2026-11-23', '00000000-0000-4000-f000-000000000001',
+   (select id from public.categorias_hora where codigo = 'desenvolvimento'), 'Telas de cadastro de pedidos: listagem e filtros.', 6, '2026-11-23 11:00-03'),
+  ('00000000-0000-4000-a000-000000000021', '2026-11-23', '00000000-0000-4000-f000-000000000002',
+   (select id from public.categorias_hora where codigo = 'analise'), 'Mapeamento dos campos do ERP.', 2, '2026-11-23 11:00-03'),
+  ('00000000-0000-4000-a000-000000000022', '2026-11-23', '00000000-0000-4000-f000-000000000001',
+   (select id from public.categorias_hora where codigo = 'desenvolvimento'), 'API de pedidos: validações de itens.', 4, '2026-11-23 11:00-03'),
+  ('00000000-0000-4000-a000-000000000022', '2026-11-23', '00000000-0000-4000-f000-000000000002',
+   (select id from public.categorias_hora where codigo = 'testes'), 'Testes da integração com o ERP em homologação.', 2, '2026-11-23 11:00-03'),
+  ('00000000-0000-4000-a000-000000000024', '2026-11-23', '00000000-0000-4000-f000-000000000004',
+   (select id from public.categorias_hora where codigo = 'correcao'), 'Correção do vencimento do boleto PJ e testes.', 6, '2026-11-23 11:00-03'),
+  ('00000000-0000-4000-a000-000000000024', '2026-11-23', '00000000-0000-4000-f000-000000000006',
+   (select id from public.categorias_hora where codigo = 'desenvolvimento'), 'Gráfico de metas por vendedor.', 2, '2026-11-23 11:00-03'),
+  ('00000000-0000-4000-a000-000000000025', '2026-11-23', '00000000-0000-4000-f000-000000000006',
+   (select id from public.categorias_hora where codigo = 'desenvolvimento'), 'Ajustes no painel.', 6, '2026-11-23 11:00-03'),
+  ('00000000-0000-4000-a000-000000000011', '2026-11-23', '00000000-0000-4000-f000-000000000001',
+   (select id from public.categorias_hora where codigo = 'desenvolvimento'), 'Revisão do modelo de dados de pedidos.', 2, '2026-11-23 11:00-03'),
+  ('00000000-0000-4000-a000-000000000011', '2026-11-23', '00000000-0000-4000-f000-000000000015',
+   (select id from public.categorias_hora where codigo = 'gestao'), 'Gestão do PMO: publicação e acompanhamento da semana.', 1.5, '2026-11-23 11:00-03'),
+  ('00000000-0000-4000-a000-000000000011', '2026-11-23', '00000000-0000-4000-f000-000000000016',
+   (select id from public.categorias_hora where codigo = 'reuniao'), 'Reunião de planejamento da semana.', 2, '2026-11-23 11:00-03');
+
+update public.apontamentos
+   set status = 'enviado', primeiro_envio_em = '2026-11-23 12:00-03', enviado_em = '2026-11-23 12:00-03'
+ where data = '2026-11-23'
+   and colaborador_id in ('00000000-0000-4000-a000-000000000022', '00000000-0000-4000-a000-000000000024',
+                          '00000000-0000-4000-a000-000000000025', '00000000-0000-4000-a000-000000000011');
+
+-- Devolução e reabertura feitas pelas funções do fluxo, como a líder Juliana
+-- (assim a auditoria registra quem fez e o motivo).
+select set_config('request.jwt.claims',
+  json_build_object('sub', '00000000-0000-4000-b000-000000000012', 'role', 'authenticated')::text, false);
+select set_config('pmo.agora', '2026-11-23 14:00-03', false);
+
+select public.devolver_apontamento(
+  (select id from public.apontamentos
+    where colaborador_id = '00000000-0000-4000-a000-000000000025' and data = '2026-11-23'),
+  'Descreva quais gráficos do painel foram ajustados.');
+
+select public.reabrir_apontamento(
+  (select id from public.apontamentos
+    where colaborador_id = '00000000-0000-4000-a000-000000000022' and data = '2026-11-16'
+      and demanda_id = '00000000-0000-4000-f000-000000000005'),
+  'A correção da NF é do contrato de sustentação: detalhe o ajuste feito na descrição.');
+
+select set_config('pmo.agora', '', false);
+select set_config('request.jwt.claims', '', false);

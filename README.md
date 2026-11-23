@@ -54,10 +54,14 @@ Mailpit (http://127.0.0.1:54324).
 - Projeto C (Cliente B, líder Rafael Souza).
 - Feriados 2027 nacionais, de SP, São José dos Campos e Jacareí, mais Carnaval e
   Corpus Christi (globais).
-- 14 demandas no backlog: Projeto C, Clientes A e B e atividades internas, com todas as
-  prioridades e status e algumas estimativas "a definir".
-- Planejamento: semana de 16/11/2026 revisada, 23/11/2026 em execução (com um
+- 16 demandas no backlog: Projeto C, Clientes A e B e atividades internas (inclusive
+  "Gestão do PMO" e "Reuniões e revisões", onde os líderes apontam gestão e reuniões), com
+  todas as prioridades e status e algumas estimativas "a definir".
+- Planejamento: semanas de 09/11 e 16/11/2026 revisadas, 23/11/2026 em execução (com um
   replanejamento pendente da DEM-0014) e 30/11/2026 em rascunho.
+- Apontamentos de 09/11 a 23/11/2026: semanas passadas aprovadas, horas não planejadas,
+  registros e envios fora do prazo, um apontamento reaberto e um devolvido; rascunhos e
+  enviados na semana atual. Controle de prazo desde 09/11/2026.
 - Férias, ausências e treinamento de alguns colaboradores (dez/2026 a fev/2027).
 
 ## Migrar para o Supabase na nuvem
