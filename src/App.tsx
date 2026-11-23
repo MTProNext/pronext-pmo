@@ -14,6 +14,7 @@ import Contratos from "@/pages/cadastros/Contratos";
 import Indisponibilidades from "@/pages/cadastros/Indisponibilidades";
 import Projetos from "@/pages/cadastros/Projetos";
 import Configuracoes from "@/pages/Configuracoes";
+import DemandaDetalhe from "@/pages/DemandaDetalhe";
 import Index from "@/pages/Index";
 import Login from "@/pages/Login";
 import MinhaSemana from "@/pages/MinhaSemana";
@@ -25,11 +26,15 @@ const queryClient = new QueryClient({
   defaultOptions: { queries: { staleTime: 30_000, refetchOnWindowFocus: false } },
 });
 
-/** Rotas internas: cada uma protegida pelos papéis definidos no menu. */
-const ROTAS = [
+/**
+ * Rotas internas, protegidas pelos papéis do item de menu (`menu`, padrão = o próprio caminho).
+ * Sub-rotas (ex.: detalhe) usam `menu` para herdar os papéis da tela principal.
+ */
+const ROTAS: { caminho: string; pagina: JSX.Element; menu?: string }[] = [
   { caminho: "/minha-semana", pagina: <MinhaSemana /> },
   { caminho: "/planejamento", pagina: <Planejamento /> },
   { caminho: "/backlog", pagina: <Backlog /> },
+  { caminho: "/backlog/:id", pagina: <DemandaDetalhe />, menu: "/backlog" },
   { caminho: "/cadastros/colaboradores", pagina: <Colaboradores /> },
   { caminho: "/cadastros/clientes", pagina: <Clientes /> },
   { caminho: "/cadastros/contratos", pagina: <Contratos /> },
@@ -51,10 +56,10 @@ const App = () => (
             <Route path="/acesso-nao-configurado" element={<AcessoNaoConfigurado />} />
             <Route element={<RotaProtegida />}>
               <Route element={<AppLayout />}>
-                {ROTAS.map(({ caminho, pagina }) => (
+                {ROTAS.map(({ caminho, pagina, menu }) => (
                   <Route
                     key={caminho}
-                    element={<RotaProtegida papeis={papeisDaRota(caminho)} />}
+                    element={<RotaProtegida papeis={papeisDaRota(menu ?? caminho)} />}
                   >
                     <Route path={caminho} element={pagina} />
                   </Route>

@@ -52,7 +52,10 @@ Mailpit (http://127.0.0.1:54324).
 - Clientes A e B; contratos de cada tipo (banco de horas, sustentação mensal, escopo
   fechado, outro) e um encerrado, com valor/hora.
 - Projeto C (Cliente B, líder Rafael Souza).
-- Feriados 2027 nacionais, de SP, São José dos Campos e Jacareí (globais).
+- Feriados 2027 nacionais, de SP, São José dos Campos e Jacareí, mais Carnaval e
+  Corpus Christi (globais).
+- 13 demandas no backlog: Projeto C, Clientes A e B e atividades internas, com todas as
+  prioridades e status e algumas estimativas "a definir".
 - Férias, ausências e treinamento de alguns colaboradores (dez/2026 a fev/2027).
 
 ## Migrar para o Supabase na nuvem

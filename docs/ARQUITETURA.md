@@ -11,7 +11,9 @@ Documento vivo: atualizado a cada etapa. Serve de contexto para o Lovable e o Cl
 - **Fase 1, etapa 2 (cadastros)**: concluída. Clientes, contratos (+ valores), projetos
   (mínimo), indisponibilidades (com feriados 2027) e tela de configurações; recuperação de
   senha no login.
-- Próximas etapas da Fase 1: 3) backlog, 4) planejamento semanal.
+- **Fase 1, etapa 3 (backlog)**: concluída. Tabela `demandas`, lista com filtros e página
+  de detalhe com edição e troca de status.
+- Próxima etapa da Fase 1: 4) planejamento semanal.
 
 ## Stack
 - Vite 5 + React 18 + TypeScript (SPA), plugin `@vitejs/plugin-react-swc`
@@ -67,6 +69,11 @@ supabase/
 - `status_projeto`: `nao_iniciado`, `em_descoberta`, `planejamento`, `em_execucao`,
   `em_homologacao`, `bloqueado`, `concluido`, `cancelado`
 - `tipo_indisponibilidade`: `ferias`, `feriado`, `ausencia`, `treinamento`, `outra`
+- `prioridade`: `p1` (Crítica), `p2` (Alta), `p3` (Normal), `p4` (Baixa) — a ordem do enum
+  é a ordem de exibição
+- `status_demanda`: `nova`, `priorizada`, `planejada`, `em_execucao`, `bloqueada`,
+  `concluida`, `cancelada`
+- `tipo_demanda`: `demanda`, `urgencia`, `correcao`, `atividade_interna`
 
 Rótulos em pt-BR de todos os enums: `src/lib/papeis.ts` e `src/lib/rotulos.ts`.
 
@@ -109,13 +116,33 @@ por cliente); `lider_id` (obrigatório; trigger exige líder técnico ativo); `s
 
 **Feriados 2027 no seed** (globais): nacionais (01/01, 26/03 Sexta-feira Santa, 21/04,
 01/05, 07/09, 12/10, 02/11, 15/11, 20/11, 25/12); SP (09/07); São José dos Campos
-(19/03, Lei 8.821/2012; 27/07, Lei 1.324/1967); Jacareí (03/04). Pontos facultativos
-(Carnaval, Quarta de Cinzas, Corpus Christi) e o 08/12 de Jacareí não foram cadastrados
-(ver decisões).
+(19/03, Lei 8.821/2012; 27/07, Lei 1.324/1967); Jacareí (03/04); pontos facultativos
+adotados pela ProNext: Carnaval (08–09/02) e Corpus Christi (27/05). Não cadastrados:
+Quarta de Cinzas e 08/12 de Jacareí.
 
-### Modelo planejado (etapas seguintes)
-`demandas`, `semanas`, `planejamento_itens`, `replanejamentos`, função
-`capacidade_efetiva` e views de capacidade (proposta aprovada do passo 1).
+### `demandas`
+| Campo | Regra |
+|---|---|
+| `codigo` | identity, exibido como `DEM-0001` (`formatCodigoDemanda`) |
+| `titulo`, `descricao` | título obrigatório |
+| `cliente_id` | **nulo = Interno** |
+| `contrato_id`, `projeto_id` | opcionais; trigger exige que sejam do cliente; sem contrato, herda o do projeto; contrato diferente do projeto é recusado |
+| `solicitante`, `data_entrada` | entrada padrão = hoje |
+| `prioridade` | padrão `p3` |
+| `lider_id` | obrigatório; trigger exige líder técnico ativo |
+| `estimativa_horas` | **nulo = "a definir"**; ≥ 0 |
+| `status` | padrão `nova`; `concluida_em` preenchido/limpo por trigger |
+| `tipo` | `atividade_interna` exige cliente nulo (constraint) |
+
+Constraints: demanda interna sem contrato/projeto; atividade interna sem cliente.
+
+### Modelo planejado (etapa 4)
+`semanas`, `planejamento_itens`, `replanejamentos`, função `capacidade_efetiva` e views de
+capacidade (proposta aprovada do passo 1). Também na etapa 4:
+- registro automático de replanejamento quando entra (ou sobe para) P1/P2 com semana
+  publicada/confirmada/em execução;
+- desenvolvedor alocado altera o status da demanda (política + trigger que bloqueia as
+  demais colunas).
 
 ## Perfis e RLS
 
@@ -140,6 +167,7 @@ Usuário autenticado sem colaborador ativo não lê nada. `anon` não lê nada.
 | `contratos_valores` | ler, criar, alterar, excluir | — | — | ler, criar, alterar, excluir |
 | `projetos` | ler, criar, alterar | ler, criar, alterar | ler | ler |
 | `indisponibilidades` | ler, criar, alterar, excluir | ler, criar, alterar, excluir | ler (as suas e as globais) | ler, criar, alterar, excluir |
+| `demandas` | ler, criar, alterar | ler, criar, alterar | ler (backlog inteiro) | ler |
 
 A divisão de colunas em `configuracoes` é garantida pelo trigger `configuracoes_guardar_colunas`.
 Nenhuma tabela de cadastro permite exclusão, exceto `indisponibilidades` e `contratos_valores`;
@@ -227,6 +255,12 @@ As colunas ficam em `components/<modulo>/colunas<Modulo>.tsx` para manter a pág
   Exclusão (quando existir) por botão de ícone na última coluna + `ConfirmacaoDialog`.
 - Tela de configurações: formulário direto no `SecaoCard` (sem Dialog), um cartão por
   bloco de permissão, campos desabilitados para quem não pode editar.
+- Listas com muitos filtros (ex.: backlog): estado dos filtros num objeto, função pura
+  `aplicarFiltros` e componente `BarraFiltros<Modulo>` próprio (`components/backlog/`).
+- Página de detalhe (ex.: `/backlog/:id`): botão "Voltar", `Pagina` com selos abaixo do
+  título, ações (Editar, menu de status) à direita e seções em `SecaoCard`. Mudança de
+  status por `DropdownMenu`; status destrutivo (cancelar) pede `ConfirmacaoDialog`
+  (use `rotuloCancelar="Voltar"` quando a ação também se chama "Cancelar ...").
 
 ### Selos (`src/lib/selos.ts`)
 Só variantes do `Badge`, com cores discretas:
@@ -238,9 +272,10 @@ Só variantes do `Badge`, com cores discretas:
 | `secondary` | estado normal do fluxo | P3 · Normal, Priorizada, Planejada, Publicada, Concluída, Ativo |
 | `outline` | neutro, inicial ou encerrado | P4 · Baixa, Nova, Cancelada, Rascunho, Revisada, Inativo |
 
-Mapas já definidos: `SELO_SITUACAO`, `SELO_STATUS_CONTRATO`, `SELO_STATUS_PROJETO`
-(tipados com `Enums<>`), `SELO_PRIORIDADE`, `SELO_STATUS_DEMANDA`, `SELO_STATUS_SEMANA`
-(tipar com `Enums<>` quando os enums existirem no banco). Contrato suspenso usa `default`;
+Mapas já definidos: `SELO_SITUACAO`, `SELO_STATUS_CONTRATO`, `SELO_STATUS_PROJETO`,
+`SELO_PRIORIDADE`, `SELO_STATUS_DEMANDA` (tipados com `Enums<>`) e `SELO_STATUS_SEMANA`
+(tipar com `Enums<>` na etapa 4). Estimativa nula aparece como Badge `outline`
+"A definir" (`components/backlog/Estimativa.tsx`). Contrato suspenso usa `default`;
 projeto bloqueado usa `destructive`.
 
 ## Rotas
@@ -252,7 +287,8 @@ projeto bloqueado usa `destructive`.
 | `/acesso-nao-configurado` | usuário sem colaborador vinculado | autenticado |
 | `/minha-semana` | `MinhaSemana` (placeholder, etapa 4) | dev, líder |
 | `/planejamento` | `Planejamento` (placeholder, etapa 4) | líder, proprietário, administrativo |
-| `/backlog` | `Backlog` (placeholder, etapa 3) | todos |
+| `/backlog` | `Backlog` (lista; filtro padrão "Em aberto") | todos (dev e adm só leem) |
+| `/backlog/:id` | `DemandaDetalhe` (editar e mudar status: líder e proprietário) | todos |
 | `/cadastros/colaboradores` | `Colaboradores` (somente leitura) | proprietário, administrativo, líder |
 | `/cadastros/clientes` | `Clientes` | proprietário, administrativo, líder |
 | `/cadastros/contratos` | `Contratos` (líder só lê; valor/hora só prop. e adm.) | proprietário, administrativo, líder |
@@ -287,10 +323,14 @@ menu. Esse controle é só de interface; a segurança está na RLS.
   `new Date("2027-01-01")` interpreta como UTC e mostraria 31/12/2026 no fuso de Brasília.
 - Valor/hora é gravado logo após o contrato (duas chamadas). Se a segunda falhar, o contrato
   fica salvo sem valor e o erro aparece no toast.
-- Feriados: cadastrados só os de lei confirmados em fonte oficial. Ficaram de fora os pontos
-  facultativos (Carnaval 08–09/02, Quarta de Cinzas, Corpus Christi 27/05) e o 08/12 de
-  Jacareí (padroeira, citado só em fonte antiga sem lei). Feriados municipais de São José
+- Feriados: os de lei confirmados em fonte oficial, mais Carnaval e Corpus Christi
+  (pontos facultativos incluídos por decisão do usuário). Ficaram de fora a Quarta de
+  Cinzas e o 08/12 de Jacareí (padroeira, citado só em fonte antiga sem lei). Feriados municipais de São José
   dos Campos e Jacareí valem para todos, conforme pedido; `localidade` guarda a origem.
+- Rotas de detalhe herdam os papéis da tela principal via `menu` em `ROTAS` (`App.tsx`).
+- Demandas: transições de status livres para líder e proprietário (sem máquina de estados
+  rígida, para não burocratizar); `concluida_em` acompanha o status. O status `planejada`
+  ainda é manual; na etapa 4 poderá ser ajustado pelo planejamento.
 - Recuperação de senha: `resetPasswordForEmail` com retorno em `/redefinir-senha`
   (permitido em `additional_redirect_urls` do `config.toml`). Localmente o e-mail chega no
   Mailpit (http://127.0.0.1:54324). Na nuvem, configurar as Redirect URLs do Auth.

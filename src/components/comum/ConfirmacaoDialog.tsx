@@ -16,6 +16,8 @@ interface Props {
   titulo: string;
   descricao: string;
   rotuloConfirmar?: string;
+  /** Rótulo do botão que fecha sem confirmar (use "Voltar" quando a ação também se chama "Cancelar..."). */
+  rotuloCancelar?: string;
   /** Destaca o botão como ação destrutiva (cancelar, inativar...). */
   destrutivo?: boolean;
   onConfirmar: () => void;
@@ -28,6 +30,7 @@ export function ConfirmacaoDialog({
   titulo,
   descricao,
   rotuloConfirmar = "Confirmar",
+  rotuloCancelar = "Cancelar",
   destrutivo,
   onConfirmar,
 }: Props) {
@@ -39,7 +42,7 @@ export function ConfirmacaoDialog({
           <AlertDialogDescription>{descricao}</AlertDialogDescription>
         </AlertDialogHeader>
         <AlertDialogFooter>
-          <AlertDialogCancel>Cancelar</AlertDialogCancel>
+          <AlertDialogCancel>{rotuloCancelar}</AlertDialogCancel>
           <AlertDialogAction
             onClick={onConfirmar}
             className={destrutivo ? buttonVariants({ variant: "destructive" }) : undefined}

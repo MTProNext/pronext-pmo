@@ -1,5 +1,10 @@
 import type { Enums } from "@/integrations/supabase/types";
-import { STATUS_CONTRATO_LABEL, STATUS_PROJETO_LABEL } from "./rotulos";
+import {
+  PRIORIDADE_LABEL,
+  STATUS_CONTRATO_LABEL,
+  STATUS_DEMANDA_LABEL,
+  STATUS_PROJETO_LABEL,
+} from "./rotulos";
 
 /**
  * Rótulo e variante do Badge para cada valor de status/prioridade.
@@ -37,28 +42,26 @@ export const SELO_STATUS_PROJETO: MapaSelos<Enums<"status_projeto">> = {
   cancelado: { rotulo: P.cancelado, variante: "outline" },
 };
 
-// Os mapas abaixo seguem os enums aprovados no passo 1. Quando os enums forem
-// criados no banco (etapas 3 e 4), troque as uniões literais por Enums<"...">.
-
-export const SELO_PRIORIDADE: MapaSelos<"p1" | "p2" | "p3" | "p4"> = {
-  p1: { rotulo: "P1 · Crítica", variante: "destructive" },
-  p2: { rotulo: "P2 · Alta", variante: "default" },
-  p3: { rotulo: "P3 · Normal", variante: "secondary" },
-  p4: { rotulo: "P4 · Baixa", variante: "outline" },
+const PR = PRIORIDADE_LABEL;
+export const SELO_PRIORIDADE: MapaSelos<Enums<"prioridade">> = {
+  p1: { rotulo: PR.p1, variante: "destructive" },
+  p2: { rotulo: PR.p2, variante: "default" },
+  p3: { rotulo: PR.p3, variante: "secondary" },
+  p4: { rotulo: PR.p4, variante: "outline" },
 };
 
-export const SELO_STATUS_DEMANDA: MapaSelos<
-  "nova" | "priorizada" | "planejada" | "em_execucao" | "bloqueada" | "concluida" | "cancelada"
-> = {
-  nova: { rotulo: "Nova", variante: "outline" },
-  priorizada: { rotulo: "Priorizada", variante: "secondary" },
-  planejada: { rotulo: "Planejada", variante: "secondary" },
-  em_execucao: { rotulo: "Em execução", variante: "default" },
-  bloqueada: { rotulo: "Bloqueada", variante: "destructive" },
-  concluida: { rotulo: "Concluída", variante: "secondary" },
-  cancelada: { rotulo: "Cancelada", variante: "outline" },
+const D = STATUS_DEMANDA_LABEL;
+export const SELO_STATUS_DEMANDA: MapaSelos<Enums<"status_demanda">> = {
+  nova: { rotulo: D.nova, variante: "outline" },
+  priorizada: { rotulo: D.priorizada, variante: "secondary" },
+  planejada: { rotulo: D.planejada, variante: "secondary" },
+  em_execucao: { rotulo: D.em_execucao, variante: "default" },
+  bloqueada: { rotulo: D.bloqueada, variante: "destructive" },
+  concluida: { rotulo: D.concluida, variante: "secondary" },
+  cancelada: { rotulo: D.cancelada, variante: "outline" },
 };
 
+// O mapa abaixo segue o enum aprovado no passo 1; tipar com Enums<"status_semana"> na etapa 4.
 export const SELO_STATUS_SEMANA: MapaSelos<
   "rascunho" | "publicada" | "confirmada" | "em_execucao" | "revisada"
 > = {

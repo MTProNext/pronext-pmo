@@ -39,6 +39,38 @@ export const TIPO_INDISPONIBILIDADE_LABEL: Record<Enums<"tipo_indisponibilidade"
   outra: "Outra",
 };
 
+export const PRIORIDADE_LABEL: Record<Enums<"prioridade">, string> = {
+  p1: "P1 · Crítica",
+  p2: "P2 · Alta",
+  p3: "P3 · Normal",
+  p4: "P4 · Baixa",
+};
+
+/** Regra de tratamento de cada prioridade (seção 5.1 do escopo). */
+export const PRIORIDADE_REGRA: Record<Enums<"prioridade">, string> = {
+  p1: "Líder avalia na hora e define a resposta.",
+  p2: "Líder avalia impacto e reprogramação.",
+  p3: "Entra no próximo planejamento.",
+  p4: "Permanece no backlog.",
+};
+
+export const STATUS_DEMANDA_LABEL: Record<Enums<"status_demanda">, string> = {
+  nova: "Nova",
+  priorizada: "Priorizada",
+  planejada: "Planejada",
+  em_execucao: "Em execução",
+  bloqueada: "Bloqueada",
+  concluida: "Concluída",
+  cancelada: "Cancelada",
+};
+
+export const TIPO_DEMANDA_LABEL: Record<Enums<"tipo_demanda">, string> = {
+  demanda: "Demanda",
+  urgencia: "Urgência",
+  correcao: "Correção",
+  atividade_interna: "Atividade interna",
+};
+
 /** Converte um mapa de rótulos em opções para Select. */
 export const opcoesDe = (rotulos: Record<string, string>) =>
   Object.entries(rotulos).map(([valor, rotulo]) => ({ valor, rotulo }));

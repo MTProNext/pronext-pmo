@@ -21,6 +21,9 @@ export const formatPeriodo = (inicio: string, fim: string | null) => {
 export const formatHours = (hours: number) =>
   `${hours.toLocaleString("pt-BR", { maximumFractionDigits: 2 })}h`;
 
+/** Código da demanda, ex.: DEM-0007. */
+export const formatCodigoDemanda = (codigo: number) => `DEM-${String(codigo).padStart(4, "0")}`;
+
 /** Valor em reais, ex.: R$ 1.234,50. */
 export const formatMoeda = (valor: number) =>
   valor.toLocaleString("pt-BR", { style: "currency", currency: "BRL" });

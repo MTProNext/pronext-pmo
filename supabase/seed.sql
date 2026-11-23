@@ -114,7 +114,10 @@ insert into public.indisponibilidades (tipo, data_inicio, data_fim, descricao, l
   ('feriado', '2027-07-09', '2027-07-09', 'Revolução Constitucionalista', 'SP'),
   ('feriado', '2027-03-19', '2027-03-19', 'Dia de São José, padroeiro (Lei 8.821/2012)', 'São José dos Campos'),
   ('feriado', '2027-07-27', '2027-07-27', 'Aniversário da cidade (Lei 1.324/1967)', 'São José dos Campos'),
-  ('feriado', '2027-04-03', '2027-04-03', 'Aniversário da cidade', 'Jacareí');
+  ('feriado', '2027-04-03', '2027-04-03', 'Aniversário da cidade', 'Jacareí'),
+  -- Pontos facultativos adotados pela ProNext
+  ('feriado', '2027-02-08', '2027-02-09', 'Carnaval (ponto facultativo)', 'Nacional'),
+  ('feriado', '2027-05-27', '2027-05-27', 'Corpus Christi (ponto facultativo)', 'Nacional');
 
 -- Férias, ausências e treinamentos individuais
 insert into public.indisponibilidades (colaborador_id, tipo, data_inicio, data_fim, horas_por_dia, descricao) values
@@ -124,3 +127,64 @@ insert into public.indisponibilidades (colaborador_id, tipo, data_inicio, data_f
   ('00000000-0000-4000-a000-000000000024', 'ferias',      '2027-02-15', '2027-02-26', null, 'Férias'),
   ('00000000-0000-4000-a000-000000000025', 'ausencia',    '2026-12-04', '2026-12-04', null, 'Assunto pessoal'),
   ('00000000-0000-4000-a000-000000000012', 'ausencia',    '2026-12-09', '2026-12-09', 4,    'Consulta médica (meio período)');
+
+-- =============================================================================
+-- Etapa 3: backlog de demandas
+-- Líderes: Rafael (…011) e Juliana (…012). Cliente A (…c001), Cliente B (…c002).
+-- Contratos: A banco de horas (…d001), A sustentação (…d002), B Projeto C (…d003),
+-- B consultoria (…d004). Projeto C (…e001).
+-- =============================================================================
+insert into public.demandas
+  (id, titulo, descricao, cliente_id, contrato_id, projeto_id, solicitante, data_entrada,
+   prioridade, lider_id, estimativa_horas, status, tipo)
+values
+  ('00000000-0000-4000-f000-000000000001', 'Módulo de cadastro de pedidos',
+   'Telas e API de cadastro de pedidos do Projeto C.',
+   '00000000-0000-4000-c000-000000000002', null, '00000000-0000-4000-e000-000000000001',
+   'Otávio Reis', '2026-11-03', 'p2', '00000000-0000-4000-a000-000000000011', 80, 'em_execucao', 'demanda'),
+  ('00000000-0000-4000-f000-000000000002', 'Integração com ERP do cliente',
+   'Envio de pedidos aprovados ao ERP via API REST.',
+   '00000000-0000-4000-c000-000000000002', null, '00000000-0000-4000-e000-000000000001',
+   'Otávio Reis', '2026-11-03', 'p2', '00000000-0000-4000-a000-000000000011', 120, 'planejada', 'demanda'),
+  ('00000000-0000-4000-f000-000000000003', 'Relatórios gerenciais do Projeto C',
+   'Escopo ainda em discussão com o cliente.',
+   '00000000-0000-4000-c000-000000000002', null, '00000000-0000-4000-e000-000000000001',
+   'Otávio Reis', '2026-11-10', 'p3', '00000000-0000-4000-a000-000000000011', null, 'priorizada', 'demanda'),
+  ('00000000-0000-4000-f000-000000000004', 'Erro ao gerar boleto no portal',
+   'Boleto sai com vencimento errado para clientes PJ.',
+   '00000000-0000-4000-c000-000000000001', '00000000-0000-4000-d000-000000000002', null,
+   'Marina Prado', '2026-11-18', 'p1', '00000000-0000-4000-a000-000000000012', 6, 'em_execucao', 'urgencia'),
+  ('00000000-0000-4000-f000-000000000005', 'Ajuste no layout da nota fiscal',
+   null,
+   '00000000-0000-4000-c000-000000000001', '00000000-0000-4000-d000-000000000002', null,
+   'Marina Prado', '2026-11-12', 'p3', '00000000-0000-4000-a000-000000000012', 4, 'concluida', 'correcao'),
+  ('00000000-0000-4000-f000-000000000006', 'Novo painel de indicadores de vendas',
+   'Dashboard com metas por vendedor.',
+   '00000000-0000-4000-c000-000000000001', '00000000-0000-4000-d000-000000000001', null,
+   'Diretoria Cliente A', '2026-11-05', 'p2', '00000000-0000-4000-a000-000000000012', 40, 'planejada', 'demanda'),
+  ('00000000-0000-4000-f000-000000000007', 'Exportação de clientes para CSV',
+   null,
+   '00000000-0000-4000-c000-000000000001', '00000000-0000-4000-d000-000000000001', null,
+   'Marina Prado', '2026-11-19', 'p3', '00000000-0000-4000-a000-000000000012', 8, 'priorizada', 'demanda'),
+  ('00000000-0000-4000-f000-000000000008', 'Migração do servidor de arquivos',
+   'Aguardando credenciais de acesso do cliente.',
+   '00000000-0000-4000-c000-000000000001', '00000000-0000-4000-d000-000000000002', null,
+   'TI Cliente A', '2026-11-09', 'p2', '00000000-0000-4000-a000-000000000012', 16, 'bloqueada', 'demanda'),
+  ('00000000-0000-4000-f000-000000000009', 'Consultoria sobre arquitetura em nuvem',
+   null,
+   '00000000-0000-4000-c000-000000000002', '00000000-0000-4000-d000-000000000004', null,
+   'Otávio Reis', '2026-11-20', 'p4', '00000000-0000-4000-a000-000000000011', null, 'nova', 'demanda'),
+  ('00000000-0000-4000-f000-000000000010', 'App mobile para representantes',
+   'Ideia levantada pelo cliente; sem escopo.',
+   '00000000-0000-4000-c000-000000000001', null, null,
+   'Diretoria Cliente A', '2026-11-21', 'p4', '00000000-0000-4000-a000-000000000012', null, 'nova', 'demanda'),
+  ('00000000-0000-4000-f000-000000000011', 'Atualização de dependências dos projetos',
+   'Atualizar bibliotecas com vulnerabilidades conhecidas.',
+   null, null, null, 'Rafael Souza', '2026-11-16', 'p3', '00000000-0000-4000-a000-000000000011', 12, 'priorizada', 'atividade_interna'),
+  ('00000000-0000-4000-f000-000000000012', 'Treinamento interno de testes automatizados',
+   null,
+   null, null, null, 'Juliana Costa', '2026-11-16', 'p4', '00000000-0000-4000-a000-000000000012', 8, 'nova', 'atividade_interna'),
+  ('00000000-0000-4000-f000-000000000013', 'Ajuste de permissões no Projeto C',
+   'Cliente desistiu da alteração.',
+   '00000000-0000-4000-c000-000000000002', null, '00000000-0000-4000-e000-000000000001',
+   'Otávio Reis', '2026-11-04', 'p3', '00000000-0000-4000-a000-000000000011', 6, 'cancelada', 'correcao');

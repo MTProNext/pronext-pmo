@@ -111,6 +111,50 @@ isOneToOne: true
       referencedColumns: ["id"]
     }
                   ]
+                },"demandas": {
+                  Row: {
+                    "cliente_id": string | null,"codigo": number,"concluida_em": string | null,"contrato_id": string | null,"created_at": string,"created_by": string | null,"data_entrada": string,"descricao": string | null,"estimativa_horas": number | null,"id": string,"lider_id": string,"prioridade": Database["public"]['Enums']["prioridade"],"projeto_id": string | null,"solicitante": string | null,"status": Database["public"]['Enums']["status_demanda"],"tipo": Database["public"]['Enums']["tipo_demanda"],"titulo": string,"updated_at": string
+                  }
+                  ComputedFields: never
+                  Insert: {
+                    "cliente_id"?: string | null,"codigo"?: never,"concluida_em"?: string | null,"contrato_id"?: string | null,"created_at"?: string,"created_by"?: string | null,"data_entrada"?: string,"descricao"?: string | null,"estimativa_horas"?: number | null,"id"?: string,"lider_id": string,"prioridade"?: Database["public"]['Enums']["prioridade"],"projeto_id"?: string | null,"solicitante"?: string | null,"status"?: Database["public"]['Enums']["status_demanda"],"tipo"?: Database["public"]['Enums']["tipo_demanda"],"titulo": string,"updated_at"?: string
+                  }
+                  Update: {
+                    "cliente_id"?: string | null,"codigo"?: never,"concluida_em"?: string | null,"contrato_id"?: string | null,"created_at"?: string,"created_by"?: string | null,"data_entrada"?: string,"descricao"?: string | null,"estimativa_horas"?: number | null,"id"?: string,"lider_id"?: string,"prioridade"?: Database["public"]['Enums']["prioridade"],"projeto_id"?: string | null,"solicitante"?: string | null,"status"?: Database["public"]['Enums']["status_demanda"],"tipo"?: Database["public"]['Enums']["tipo_demanda"],"titulo"?: string,"updated_at"?: string
+                  }
+                  Relationships: [
+                    {
+      foreignKeyName: "demandas_cliente_id_fkey"
+      columns: ["cliente_id"]
+isOneToOne: false
+      referencedRelation: "clientes"
+      referencedColumns: ["id"]
+    },{
+      foreignKeyName: "demandas_contrato_id_fkey"
+      columns: ["contrato_id"]
+isOneToOne: false
+      referencedRelation: "contratos"
+      referencedColumns: ["id"]
+    },{
+      foreignKeyName: "demandas_created_by_fkey"
+      columns: ["created_by"]
+isOneToOne: false
+      referencedRelation: "colaboradores"
+      referencedColumns: ["id"]
+    },{
+      foreignKeyName: "demandas_lider_id_fkey"
+      columns: ["lider_id"]
+isOneToOne: false
+      referencedRelation: "colaboradores"
+      referencedColumns: ["id"]
+    },{
+      foreignKeyName: "demandas_projeto_id_fkey"
+      columns: ["projeto_id"]
+isOneToOne: false
+      referencedRelation: "projetos"
+      referencedColumns: ["id"]
+    }
+                  ]
                 },"indisponibilidades": {
                   Row: {
                     "colaborador_id": string | null,"created_at": string,"created_by": string | null,"data_fim": string,"data_inicio": string,"descricao": string | null,"horas_por_dia": number | null,"id": string,"localidade": string | null,"tipo": Database["public"]['Enums']["tipo_indisponibilidade"],"updated_at": string
@@ -198,7 +242,7 @@ isOneToOne: false
                            }
           }
           Enums: {
-            "papel": "proprietario"|"lider_tecnico"|"desenvolvedor"|"administrativo","periodicidade_horas": "total"|"mensal","senioridade": "junior"|"pleno"|"senior"|"especialista","status_contrato": "ativo"|"suspenso"|"encerrado","status_projeto": "nao_iniciado"|"em_descoberta"|"planejamento"|"em_execucao"|"em_homologacao"|"bloqueado"|"concluido"|"cancelado","tipo_contrato": "banco_horas"|"escopo_fechado"|"sustentacao"|"outro","tipo_indisponibilidade": "ferias"|"feriado"|"ausencia"|"treinamento"|"outra"
+            "papel": "proprietario"|"lider_tecnico"|"desenvolvedor"|"administrativo","periodicidade_horas": "total"|"mensal","prioridade": "p1"|"p2"|"p3"|"p4","senioridade": "junior"|"pleno"|"senior"|"especialista","status_contrato": "ativo"|"suspenso"|"encerrado","status_demanda": "nova"|"priorizada"|"planejada"|"em_execucao"|"bloqueada"|"concluida"|"cancelada","status_projeto": "nao_iniciado"|"em_descoberta"|"planejamento"|"em_execucao"|"em_homologacao"|"bloqueado"|"concluido"|"cancelado","tipo_contrato": "banco_horas"|"escopo_fechado"|"sustentacao"|"outro","tipo_demanda": "demanda"|"urgencia"|"correcao"|"atividade_interna","tipo_indisponibilidade": "ferias"|"feriado"|"ausencia"|"treinamento"|"outra"
           }
           CompositeTypes: {
             [_ in never]: never
@@ -314,7 +358,7 @@ export type CompositeTypes<
 export const Constants = {
   "public": {
           Enums: {
-            "papel": ["proprietario", "lider_tecnico", "desenvolvedor", "administrativo"],"periodicidade_horas": ["total", "mensal"],"senioridade": ["junior", "pleno", "senior", "especialista"],"status_contrato": ["ativo", "suspenso", "encerrado"],"status_projeto": ["nao_iniciado", "em_descoberta", "planejamento", "em_execucao", "em_homologacao", "bloqueado", "concluido", "cancelado"],"tipo_contrato": ["banco_horas", "escopo_fechado", "sustentacao", "outro"],"tipo_indisponibilidade": ["ferias", "feriado", "ausencia", "treinamento", "outra"]
+            "papel": ["proprietario", "lider_tecnico", "desenvolvedor", "administrativo"],"periodicidade_horas": ["total", "mensal"],"prioridade": ["p1", "p2", "p3", "p4"],"senioridade": ["junior", "pleno", "senior", "especialista"],"status_contrato": ["ativo", "suspenso", "encerrado"],"status_demanda": ["nova", "priorizada", "planejada", "em_execucao", "bloqueada", "concluida", "cancelada"],"status_projeto": ["nao_iniciado", "em_descoberta", "planejamento", "em_execucao", "em_homologacao", "bloqueado", "concluido", "cancelado"],"tipo_contrato": ["banco_horas", "escopo_fechado", "sustentacao", "outro"],"tipo_demanda": ["demanda", "urgencia", "correcao", "atividade_interna"],"tipo_indisponibilidade": ["ferias", "feriado", "ausencia", "treinamento", "outra"]
           }
         }
 } as const

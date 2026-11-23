@@ -13,6 +13,9 @@ const CONSTRAINTS: Record<string, string> = {
   indisponibilidades_periodo_valido: "A data final não pode ser anterior à inicial.",
   indisponibilidades_global_so_feriado: "Só feriados podem valer para todos os colaboradores.",
   configuracoes_faixas_somam_100: "As faixas de capacidade precisam somar 100%.",
+  demandas_interna_sem_contrato_projeto: "Demanda interna não pode ter contrato nem projeto.",
+  demandas_atividade_interna_sem_cliente: "Atividade interna não pode ter cliente.",
+  demandas_estimativa_horas_check: "A estimativa não pode ser negativa.",
 };
 
 export function traduzirErro(erro: ErroSupabase): string {
