@@ -1,0 +1,4 @@
+-- Seed do ambiente local. Aplicado por `npm run db:reset` (supabase db reset),
+-- depois de todas as migrations em supabase/migrations/.
+-- Os dados (colaboradores, clientes, contratos, usuários de teste por perfil)
+-- serão adicionados junto com as migrations da Fase 1.
