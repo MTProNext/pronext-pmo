@@ -45,6 +45,16 @@ Criados por `supabase/seed.sql` (dados fictícios). **Senha de todos: `Teste@123
 Para criar outro usuário: cadastre o colaborador e crie o usuário com o mesmo e-mail
 no Studio (Authentication → Add user). O vínculo é automático pelo e-mail.
 
+"Esqueci a senha" no login envia o link de redefinição; localmente o e-mail aparece no
+Mailpit (http://127.0.0.1:54324).
+
+## Dados de exemplo (seed)
+- Clientes A e B; contratos de cada tipo (banco de horas, sustentação mensal, escopo
+  fechado, outro) e um encerrado, com valor/hora.
+- Projeto C (Cliente B, líder Rafael Souza).
+- Feriados 2027 nacionais, de SP, São José dos Campos e Jacareí (globais).
+- Férias, ausências e treinamento de alguns colaboradores (dez/2026 a fev/2027).
+
 ## Migrar para o Supabase na nuvem
 1. Atualize o `.env` com a URL e a anon key do projeto.
 2. `npx supabase link --project-ref <ref>`

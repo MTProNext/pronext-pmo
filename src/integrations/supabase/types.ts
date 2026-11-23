@@ -5,7 +5,27 @@ export type Database = {
   
   "public": {
           Tables: {
-            "colaboradores": {
+            "clientes": {
+                  Row: {
+                    "ativo": boolean,"contato": string | null,"created_at": string,"created_by": string | null,"documento": string | null,"id": string,"nome": string,"updated_at": string
+                  }
+                  ComputedFields: never
+                  Insert: {
+                    "ativo"?: boolean,"contato"?: string | null,"created_at"?: string,"created_by"?: string | null,"documento"?: string | null,"id"?: string,"nome": string,"updated_at"?: string
+                  }
+                  Update: {
+                    "ativo"?: boolean,"contato"?: string | null,"created_at"?: string,"created_by"?: string | null,"documento"?: string | null,"id"?: string,"nome"?: string,"updated_at"?: string
+                  }
+                  Relationships: [
+                    {
+      foreignKeyName: "clientes_created_by_fkey"
+      columns: ["created_by"]
+isOneToOne: false
+      referencedRelation: "colaboradores"
+      referencedColumns: ["id"]
+    }
+                  ]
+                },"colaboradores": {
                   Row: {
                     "ativo": boolean,"competencias": (string)[],"created_at": string,"email": string,"horas_dev_semanais": number,"id": string,"jornada_semanal": number,"lider_id": string | null,"nome": string,"papel": Database["public"]['Enums']["papel"],"senioridade": Database["public"]['Enums']["senioridade"] | null,"updated_at": string,"user_id": string | null
                   }
@@ -45,6 +65,116 @@ isOneToOne: false
       referencedColumns: ["id"]
     }
                   ]
+                },"contratos": {
+                  Row: {
+                    "cliente_id": string,"created_at": string,"created_by": string | null,"horas_contratadas": number | null,"id": string,"nome": string,"observacoes": string | null,"periodicidade_horas": Database["public"]['Enums']["periodicidade_horas"],"status": Database["public"]['Enums']["status_contrato"],"tipo": Database["public"]['Enums']["tipo_contrato"],"updated_at": string,"vigencia_fim": string | null,"vigencia_inicio": string
+                  }
+                  ComputedFields: never
+                  Insert: {
+                    "cliente_id": string,"created_at"?: string,"created_by"?: string | null,"horas_contratadas"?: number | null,"id"?: string,"nome": string,"observacoes"?: string | null,"periodicidade_horas"?: Database["public"]['Enums']["periodicidade_horas"],"status"?: Database["public"]['Enums']["status_contrato"],"tipo": Database["public"]['Enums']["tipo_contrato"],"updated_at"?: string,"vigencia_fim"?: string | null,"vigencia_inicio": string
+                  }
+                  Update: {
+                    "cliente_id"?: string,"created_at"?: string,"created_by"?: string | null,"horas_contratadas"?: number | null,"id"?: string,"nome"?: string,"observacoes"?: string | null,"periodicidade_horas"?: Database["public"]['Enums']["periodicidade_horas"],"status"?: Database["public"]['Enums']["status_contrato"],"tipo"?: Database["public"]['Enums']["tipo_contrato"],"updated_at"?: string,"vigencia_fim"?: string | null,"vigencia_inicio"?: string
+                  }
+                  Relationships: [
+                    {
+      foreignKeyName: "contratos_cliente_id_fkey"
+      columns: ["cliente_id"]
+isOneToOne: false
+      referencedRelation: "clientes"
+      referencedColumns: ["id"]
+    },{
+      foreignKeyName: "contratos_created_by_fkey"
+      columns: ["created_by"]
+isOneToOne: false
+      referencedRelation: "colaboradores"
+      referencedColumns: ["id"]
+    }
+                  ]
+                },"contratos_valores": {
+                  Row: {
+                    "contrato_id": string,"updated_at": string,"valor_hora": number
+                  }
+                  ComputedFields: never
+                  Insert: {
+                    "contrato_id": string,"updated_at"?: string,"valor_hora": number
+                  }
+                  Update: {
+                    "contrato_id"?: string,"updated_at"?: string,"valor_hora"?: number
+                  }
+                  Relationships: [
+                    {
+      foreignKeyName: "contratos_valores_contrato_id_fkey"
+      columns: ["contrato_id"]
+isOneToOne: true
+      referencedRelation: "contratos"
+      referencedColumns: ["id"]
+    }
+                  ]
+                },"indisponibilidades": {
+                  Row: {
+                    "colaborador_id": string | null,"created_at": string,"created_by": string | null,"data_fim": string,"data_inicio": string,"descricao": string | null,"horas_por_dia": number | null,"id": string,"localidade": string | null,"tipo": Database["public"]['Enums']["tipo_indisponibilidade"],"updated_at": string
+                  }
+                  ComputedFields: never
+                  Insert: {
+                    "colaborador_id"?: string | null,"created_at"?: string,"created_by"?: string | null,"data_fim": string,"data_inicio": string,"descricao"?: string | null,"horas_por_dia"?: number | null,"id"?: string,"localidade"?: string | null,"tipo": Database["public"]['Enums']["tipo_indisponibilidade"],"updated_at"?: string
+                  }
+                  Update: {
+                    "colaborador_id"?: string | null,"created_at"?: string,"created_by"?: string | null,"data_fim"?: string,"data_inicio"?: string,"descricao"?: string | null,"horas_por_dia"?: number | null,"id"?: string,"localidade"?: string | null,"tipo"?: Database["public"]['Enums']["tipo_indisponibilidade"],"updated_at"?: string
+                  }
+                  Relationships: [
+                    {
+      foreignKeyName: "indisponibilidades_colaborador_id_fkey"
+      columns: ["colaborador_id"]
+isOneToOne: false
+      referencedRelation: "colaboradores"
+      referencedColumns: ["id"]
+    },{
+      foreignKeyName: "indisponibilidades_created_by_fkey"
+      columns: ["created_by"]
+isOneToOne: false
+      referencedRelation: "colaboradores"
+      referencedColumns: ["id"]
+    }
+                  ]
+                },"projetos": {
+                  Row: {
+                    "cliente_id": string,"contrato_id": string | null,"created_at": string,"created_by": string | null,"data_fim_prevista": string | null,"data_inicio_prevista": string | null,"id": string,"lider_id": string,"nome": string,"status": Database["public"]['Enums']["status_projeto"],"updated_at": string
+                  }
+                  ComputedFields: never
+                  Insert: {
+                    "cliente_id": string,"contrato_id"?: string | null,"created_at"?: string,"created_by"?: string | null,"data_fim_prevista"?: string | null,"data_inicio_prevista"?: string | null,"id"?: string,"lider_id": string,"nome": string,"status"?: Database["public"]['Enums']["status_projeto"],"updated_at"?: string
+                  }
+                  Update: {
+                    "cliente_id"?: string,"contrato_id"?: string | null,"created_at"?: string,"created_by"?: string | null,"data_fim_prevista"?: string | null,"data_inicio_prevista"?: string | null,"id"?: string,"lider_id"?: string,"nome"?: string,"status"?: Database["public"]['Enums']["status_projeto"],"updated_at"?: string
+                  }
+                  Relationships: [
+                    {
+      foreignKeyName: "projetos_cliente_id_fkey"
+      columns: ["cliente_id"]
+isOneToOne: false
+      referencedRelation: "clientes"
+      referencedColumns: ["id"]
+    },{
+      foreignKeyName: "projetos_contrato_id_fkey"
+      columns: ["contrato_id"]
+isOneToOne: false
+      referencedRelation: "contratos"
+      referencedColumns: ["id"]
+    },{
+      foreignKeyName: "projetos_created_by_fkey"
+      columns: ["created_by"]
+isOneToOne: false
+      referencedRelation: "colaboradores"
+      referencedColumns: ["id"]
+    },{
+      foreignKeyName: "projetos_lider_id_fkey"
+      columns: ["lider_id"]
+isOneToOne: false
+      referencedRelation: "colaboradores"
+      referencedColumns: ["id"]
+    }
+                  ]
                 }
           }
           Views: {
@@ -53,6 +183,9 @@ isOneToOne: false
           Functions: {
             "colaborador_atual_id":
 { Args: Record<PropertyKey, never>; Returns: string
+                           },
+"eh_lider_tecnico_ativo":
+{ Args: { "p_colaborador_id": string }; Returns: boolean
                            },
 "lidera":
 { Args: { "p_colaborador_id": string }; Returns: boolean
@@ -65,7 +198,7 @@ isOneToOne: false
                            }
           }
           Enums: {
-            "papel": "proprietario"|"lider_tecnico"|"desenvolvedor"|"administrativo","senioridade": "junior"|"pleno"|"senior"|"especialista"
+            "papel": "proprietario"|"lider_tecnico"|"desenvolvedor"|"administrativo","periodicidade_horas": "total"|"mensal","senioridade": "junior"|"pleno"|"senior"|"especialista","status_contrato": "ativo"|"suspenso"|"encerrado","status_projeto": "nao_iniciado"|"em_descoberta"|"planejamento"|"em_execucao"|"em_homologacao"|"bloqueado"|"concluido"|"cancelado","tipo_contrato": "banco_horas"|"escopo_fechado"|"sustentacao"|"outro","tipo_indisponibilidade": "ferias"|"feriado"|"ausencia"|"treinamento"|"outra"
           }
           CompositeTypes: {
             [_ in never]: never
@@ -181,7 +314,7 @@ export type CompositeTypes<
 export const Constants = {
   "public": {
           Enums: {
-            "papel": ["proprietario", "lider_tecnico", "desenvolvedor", "administrativo"],"senioridade": ["junior", "pleno", "senior", "especialista"]
+            "papel": ["proprietario", "lider_tecnico", "desenvolvedor", "administrativo"],"periodicidade_horas": ["total", "mensal"],"senioridade": ["junior", "pleno", "senior", "especialista"],"status_contrato": ["ativo", "suspenso", "encerrado"],"status_projeto": ["nao_iniciado", "em_descoberta", "planejamento", "em_execucao", "em_homologacao", "bloqueado", "concluido", "cancelado"],"tipo_contrato": ["banco_horas", "escopo_fechado", "sustentacao", "outro"],"tipo_indisponibilidade": ["ferias", "feriado", "ausencia", "treinamento", "outra"]
           }
         }
 } as const

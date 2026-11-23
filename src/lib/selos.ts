@@ -1,3 +1,6 @@
+import type { Enums } from "@/integrations/supabase/types";
+import { STATUS_CONTRATO_LABEL, STATUS_PROJETO_LABEL } from "./rotulos";
+
 /**
  * Rótulo e variante do Badge para cada valor de status/prioridade.
  * Regra de cor (discreta, só variantes do shadcn):
@@ -13,6 +16,25 @@ export type MapaSelos<T extends string> = Record<T, { rotulo: string; variante: 
 export const SELO_SITUACAO: MapaSelos<"ativo" | "inativo"> = {
   ativo: { rotulo: "Ativo", variante: "secondary" },
   inativo: { rotulo: "Inativo", variante: "outline" },
+};
+
+const C = STATUS_CONTRATO_LABEL;
+export const SELO_STATUS_CONTRATO: MapaSelos<Enums<"status_contrato">> = {
+  ativo: { rotulo: C.ativo, variante: "secondary" },
+  suspenso: { rotulo: C.suspenso, variante: "default" },
+  encerrado: { rotulo: C.encerrado, variante: "outline" },
+};
+
+const P = STATUS_PROJETO_LABEL;
+export const SELO_STATUS_PROJETO: MapaSelos<Enums<"status_projeto">> = {
+  nao_iniciado: { rotulo: P.nao_iniciado, variante: "outline" },
+  em_descoberta: { rotulo: P.em_descoberta, variante: "secondary" },
+  planejamento: { rotulo: P.planejamento, variante: "secondary" },
+  em_execucao: { rotulo: P.em_execucao, variante: "default" },
+  em_homologacao: { rotulo: P.em_homologacao, variante: "secondary" },
+  bloqueado: { rotulo: P.bloqueado, variante: "destructive" },
+  concluido: { rotulo: P.concluido, variante: "secondary" },
+  cancelado: { rotulo: P.cancelado, variante: "outline" },
 };
 
 // Os mapas abaixo seguem os enums aprovados no passo 1. Quando os enums forem

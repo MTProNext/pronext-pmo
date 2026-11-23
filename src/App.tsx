@@ -8,12 +8,18 @@ import { papeisDaRota } from "@/components/layout/navegacao";
 import { SessaoProvider } from "@/hooks/useSessao";
 import AcessoNaoConfigurado from "@/pages/AcessoNaoConfigurado";
 import Backlog from "@/pages/Backlog";
+import Clientes from "@/pages/cadastros/Clientes";
 import Colaboradores from "@/pages/cadastros/Colaboradores";
+import Contratos from "@/pages/cadastros/Contratos";
+import Indisponibilidades from "@/pages/cadastros/Indisponibilidades";
+import Projetos from "@/pages/cadastros/Projetos";
+import Configuracoes from "@/pages/Configuracoes";
 import Index from "@/pages/Index";
 import Login from "@/pages/Login";
 import MinhaSemana from "@/pages/MinhaSemana";
 import NotFound from "@/pages/NotFound";
 import Planejamento from "@/pages/Planejamento";
+import RedefinirSenha from "@/pages/RedefinirSenha";
 
 const queryClient = new QueryClient({
   defaultOptions: { queries: { staleTime: 30_000, refetchOnWindowFocus: false } },
@@ -25,6 +31,11 @@ const ROTAS = [
   { caminho: "/planejamento", pagina: <Planejamento /> },
   { caminho: "/backlog", pagina: <Backlog /> },
   { caminho: "/cadastros/colaboradores", pagina: <Colaboradores /> },
+  { caminho: "/cadastros/clientes", pagina: <Clientes /> },
+  { caminho: "/cadastros/contratos", pagina: <Contratos /> },
+  { caminho: "/cadastros/projetos", pagina: <Projetos /> },
+  { caminho: "/cadastros/indisponibilidades", pagina: <Indisponibilidades /> },
+  { caminho: "/configuracoes", pagina: <Configuracoes /> },
 ];
 
 const App = () => (
@@ -36,6 +47,7 @@ const App = () => (
           <Routes>
             <Route path="/" element={<Index />} />
             <Route path="/login" element={<Login />} />
+            <Route path="/redefinir-senha" element={<RedefinirSenha />} />
             <Route path="/acesso-nao-configurado" element={<AcessoNaoConfigurado />} />
             <Route element={<RotaProtegida />}>
               <Route element={<AppLayout />}>

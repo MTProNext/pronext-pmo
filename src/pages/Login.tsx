@@ -1,3 +1,4 @@
+import { useState } from "react";
 import { Navigate, useLocation, useNavigate } from "react-router-dom";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -10,6 +11,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
+import { EsqueciSenhaDialog } from "@/components/auth/EsqueciSenhaDialog";
 
 const esquema = z.object({
   email: z.string().trim().min(1, "Informe o e-mail.").email("E-mail inválido."),
@@ -28,6 +30,7 @@ const Login = () => {
     resolver: zodResolver(esquema),
     defaultValues: { email: "", senha: "" },
   });
+  const [esqueciAberto, setEsqueciAberto] = useState(false);
 
   if (session) return <Navigate to={destino} replace />;
 
@@ -72,7 +75,17 @@ const Login = () => {
                 name="senha"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Senha</FormLabel>
+                    <div className="flex items-center justify-between">
+                      <FormLabel>Senha</FormLabel>
+                      <Button
+                        type="button"
+                        variant="link"
+                        className="h-auto p-0 text-sm font-normal"
+                        onClick={() => setEsqueciAberto(true)}
+                      >
+                        Esqueci a senha
+                      </Button>
+                    </div>
                     <FormControl>
                       <Input type="password" autoComplete="current-password" {...field} />
                     </FormControl>
@@ -88,6 +101,11 @@ const Login = () => {
           </Form>
         </CardContent>
       </Card>
+      <EsqueciSenhaDialog
+        aberto={esqueciAberto}
+        onAbertoChange={setEsqueciAberto}
+        emailInicial={form.getValues("email")}
+      />
     </main>
   );
 };

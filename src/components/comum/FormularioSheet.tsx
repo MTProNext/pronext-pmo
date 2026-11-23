@@ -34,6 +34,15 @@ export function FormularioSheet<T extends FieldValues>({
   rotuloSalvar,
   children,
 }: Props<T>) {
+  // Erros de gravação já viram toast no hook de mutação; o formulário continua aberto.
+  const salvarComSeguranca = async (dados: T) => {
+    try {
+      await onSalvar(dados);
+    } catch {
+      /* mensagem já exibida */
+    }
+  };
+
   return (
     <Sheet open={aberto} onOpenChange={onAbertoChange}>
       <SheetContent className="w-full overflow-y-auto sm:max-w-xl">
@@ -42,7 +51,7 @@ export function FormularioSheet<T extends FieldValues>({
           {descricao && <SheetDescription>{descricao}</SheetDescription>}
         </SheetHeader>
         <Form {...form}>
-          <form onSubmit={form.handleSubmit(onSalvar)} className="mt-6 space-y-4">
+          <form onSubmit={form.handleSubmit(salvarComSeguranca)} className="mt-6 space-y-4">
             {children}
             <SheetFooter className="gap-2 pt-2">
               <BotoesFormulario

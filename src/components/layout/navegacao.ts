@@ -1,5 +1,19 @@
-import { CalendarCheck, CalendarRange, ListTodo, Users, type LucideIcon } from "lucide-react";
+import {
+  Building2,
+  CalendarCheck,
+  CalendarOff,
+  CalendarRange,
+  FileText,
+  FolderKanban,
+  ListTodo,
+  Settings,
+  Users,
+  type LucideIcon,
+} from "lucide-react";
 import type { Papel } from "@/lib/papeis";
+
+/** Perfis de gestão: veem cadastros e configurações (o que cada um edita está em lib/permissoes.ts). */
+const GESTAO: Papel[] = ["proprietario", "lider_tecnico", "administrativo"];
 
 export interface ItemNavegacao {
   titulo: string;
@@ -45,9 +59,22 @@ export const NAVEGACAO: GrupoNavegacao[] = [
         titulo: "Colaboradores",
         rota: "/cadastros/colaboradores",
         icone: Users,
-        papeis: ["proprietario", "administrativo", "lider_tecnico"],
+        papeis: GESTAO,
+      },
+      { titulo: "Clientes", rota: "/cadastros/clientes", icone: Building2, papeis: GESTAO },
+      { titulo: "Contratos", rota: "/cadastros/contratos", icone: FileText, papeis: GESTAO },
+      { titulo: "Projetos", rota: "/cadastros/projetos", icone: FolderKanban, papeis: GESTAO },
+      {
+        titulo: "Indisponibilidades",
+        rota: "/cadastros/indisponibilidades",
+        icone: CalendarOff,
+        papeis: GESTAO,
       },
     ],
+  },
+  {
+    titulo: "Administração",
+    itens: [{ titulo: "Configurações", rota: "/configuracoes", icone: Settings, papeis: GESTAO }],
   },
 ];
 

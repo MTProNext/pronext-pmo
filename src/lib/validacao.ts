@@ -56,3 +56,7 @@ const mapaErros: z.ZodErrorMap = (issue, ctx) => {
 };
 
 z.setErrorMap(mapaErros);
+
+/** z.enum a partir de um mapa de rótulos (ex.: TIPO_CONTRATO_LABEL), sem repetir os valores. */
+export const enumDe = <T extends string>(rotulos: Record<T, string>) =>
+  z.enum(Object.keys(rotulos) as [T, ...T[]]);

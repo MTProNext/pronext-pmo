@@ -59,3 +59,68 @@ select n.id::text, n.id,
        jsonb_build_object('sub', n.id::text, 'email', n.email, 'email_verified', true),
        'email', now(), now(), now()
 from novos n;
+
+-- =============================================================================
+-- Etapa 2: cadastros
+-- =============================================================================
+
+-- Clientes
+insert into public.clientes (id, nome, documento, contato) values
+  ('00000000-0000-4000-c000-000000000001', 'Cliente A', '11.111.111/0001-11', 'Marina Prado (marina@clientea.example.com)'),
+  ('00000000-0000-4000-c000-000000000002', 'Cliente B', '22.222.222/0001-22', 'Otávio Reis (otavio@clienteb.example.com)');
+
+-- Contratos (um de cada tipo + um encerrado)
+insert into public.contratos
+  (id, cliente_id, nome, tipo, horas_contratadas, periodicidade_horas, vigencia_inicio, vigencia_fim, status, observacoes)
+values
+  ('00000000-0000-4000-d000-000000000001', '00000000-0000-4000-c000-000000000001',
+   'Banco de horas 2027', 'banco_horas', 400, 'total', '2027-01-01', '2027-12-31', 'ativo', null),
+  ('00000000-0000-4000-d000-000000000002', '00000000-0000-4000-c000-000000000001',
+   'Sustentação mensal', 'sustentacao', 40, 'mensal', '2026-07-01', null, 'ativo', 'Suporte e correções do sistema legado.'),
+  ('00000000-0000-4000-d000-000000000003', '00000000-0000-4000-c000-000000000002',
+   'Projeto C - escopo fechado', 'escopo_fechado', 600, 'total', '2026-11-01', '2027-04-30', 'ativo', null),
+  ('00000000-0000-4000-d000-000000000004', '00000000-0000-4000-c000-000000000002',
+   'Consultoria avulsa', 'outro', null, 'total', '2026-10-01', null, 'ativo', 'Horas sob demanda, sem franquia.'),
+  ('00000000-0000-4000-d000-000000000005', '00000000-0000-4000-c000-000000000002',
+   'Banco de horas 2026', 'banco_horas', 200, 'total', '2026-01-01', '2026-10-31', 'encerrado', null);
+
+insert into public.contratos_valores (contrato_id, valor_hora) values
+  ('00000000-0000-4000-d000-000000000001', 180),
+  ('00000000-0000-4000-d000-000000000002', 150),
+  ('00000000-0000-4000-d000-000000000003', 200),
+  ('00000000-0000-4000-d000-000000000004', 220),
+  ('00000000-0000-4000-d000-000000000005', 170);
+
+-- Projeto C (Cliente B), liderado por Rafael Souza
+insert into public.projetos
+  (id, cliente_id, contrato_id, nome, lider_id, status, data_inicio_prevista, data_fim_prevista)
+values
+  ('00000000-0000-4000-e000-000000000001', '00000000-0000-4000-c000-000000000002',
+   '00000000-0000-4000-d000-000000000003', 'Projeto C', '00000000-0000-4000-a000-000000000011',
+   'em_execucao', '2026-11-03', '2027-04-30');
+
+-- Feriados 2027 (globais): nacionais, estadual (SP) e municipais (São José dos Campos e Jacareí)
+insert into public.indisponibilidades (tipo, data_inicio, data_fim, descricao, localidade) values
+  ('feriado', '2027-01-01', '2027-01-01', 'Confraternização Universal', 'Nacional'),
+  ('feriado', '2027-03-26', '2027-03-26', 'Sexta-feira Santa', 'Nacional'),
+  ('feriado', '2027-04-21', '2027-04-21', 'Tiradentes', 'Nacional'),
+  ('feriado', '2027-05-01', '2027-05-01', 'Dia do Trabalho', 'Nacional'),
+  ('feriado', '2027-09-07', '2027-09-07', 'Independência do Brasil', 'Nacional'),
+  ('feriado', '2027-10-12', '2027-10-12', 'Nossa Senhora Aparecida', 'Nacional'),
+  ('feriado', '2027-11-02', '2027-11-02', 'Finados', 'Nacional'),
+  ('feriado', '2027-11-15', '2027-11-15', 'Proclamação da República', 'Nacional'),
+  ('feriado', '2027-11-20', '2027-11-20', 'Dia Nacional de Zumbi e da Consciência Negra', 'Nacional'),
+  ('feriado', '2027-12-25', '2027-12-25', 'Natal', 'Nacional'),
+  ('feriado', '2027-07-09', '2027-07-09', 'Revolução Constitucionalista', 'SP'),
+  ('feriado', '2027-03-19', '2027-03-19', 'Dia de São José, padroeiro (Lei 8.821/2012)', 'São José dos Campos'),
+  ('feriado', '2027-07-27', '2027-07-27', 'Aniversário da cidade (Lei 1.324/1967)', 'São José dos Campos'),
+  ('feriado', '2027-04-03', '2027-04-03', 'Aniversário da cidade', 'Jacareí');
+
+-- Férias, ausências e treinamentos individuais
+insert into public.indisponibilidades (colaborador_id, tipo, data_inicio, data_fim, horas_por_dia, descricao) values
+  ('00000000-0000-4000-a000-000000000021', 'ferias',      '2026-12-21', '2026-12-31', null, 'Férias de fim de ano'),
+  ('00000000-0000-4000-a000-000000000022', 'ferias',      '2027-01-11', '2027-01-22', null, 'Férias'),
+  ('00000000-0000-4000-a000-000000000023', 'treinamento', '2026-12-02', '2026-12-03', null, 'Curso de testes automatizados'),
+  ('00000000-0000-4000-a000-000000000024', 'ferias',      '2027-02-15', '2027-02-26', null, 'Férias'),
+  ('00000000-0000-4000-a000-000000000025', 'ausencia',    '2026-12-04', '2026-12-04', null, 'Assunto pessoal'),
+  ('00000000-0000-4000-a000-000000000012', 'ausencia',    '2026-12-09', '2026-12-09', 4,    'Consulta médica (meio período)');

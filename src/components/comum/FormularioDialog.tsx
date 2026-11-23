@@ -34,6 +34,15 @@ export function FormularioDialog<T extends FieldValues>({
   rotuloSalvar,
   children,
 }: Props<T>) {
+  // Erros de gravação já viram toast no hook de mutação; o formulário continua aberto.
+  const salvarComSeguranca = async (dados: T) => {
+    try {
+      await onSalvar(dados);
+    } catch {
+      /* mensagem já exibida */
+    }
+  };
+
   return (
     <Dialog open={aberto} onOpenChange={onAbertoChange}>
       <DialogContent className="max-h-[90vh] overflow-y-auto sm:max-w-lg">
@@ -42,7 +51,7 @@ export function FormularioDialog<T extends FieldValues>({
           {descricao && <DialogDescription>{descricao}</DialogDescription>}
         </DialogHeader>
         <Form {...form}>
-          <form onSubmit={form.handleSubmit(onSalvar)} className="space-y-4">
+          <form onSubmit={form.handleSubmit(salvarComSeguranca)} className="space-y-4">
             {children}
             <DialogFooter>
               <BotoesFormulario
