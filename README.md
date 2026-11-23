@@ -29,9 +29,21 @@ Supabase Studio local: http://127.0.0.1:54323 · E-mails (Mailpit): http://127.0
 | `npm run db:start` / `db:stop` | Sobe / derruba o Supabase local |
 | `npm run db:reset` | Recria o banco local com migrations e seed |
 | `npm run db:types` | Gera `src/integrations/supabase/types.ts` a partir do banco local |
+| `npm run db:test` | Roda os testes SQL (pgTAP) em `supabase/tests/` |
 
 ## Usuários de teste
-Serão criados pelo seed na Fase 1 (um por perfil) e documentados aqui.
+Criados por `supabase/seed.sql` (dados fictícios). **Senha de todos: `Teste@123`**
+
+| Perfil | E-mail | Nome | Tela inicial |
+|---|---|---|---|
+| Proprietário | `proprietario@example.com` | Paulo Almeida | `/planejamento` |
+| Administrativo | `administrativo@example.com` | Carla Mendes | `/cadastros/colaboradores` |
+| Líder técnico | `lider1@example.com` | Rafael Souza (equipe: dev1–dev3) | `/planejamento` |
+| Líder técnico | `lider2@example.com` | Juliana Costa (equipe: dev4–dev5) | `/planejamento` |
+| Desenvolvedor | `dev1@example.com` … `dev5@example.com` | Bruno, Fernanda, Diego, Aline, Thiago | `/minha-semana` |
+
+Para criar outro usuário: cadastre o colaborador e crie o usuário com o mesmo e-mail
+no Studio (Authentication → Add user). O vínculo é automático pelo e-mail.
 
 ## Migrar para o Supabase na nuvem
 1. Atualize o `.env` com a URL e a anon key do projeto.

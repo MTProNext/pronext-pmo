@@ -5,16 +5,67 @@ export type Database = {
   
   "public": {
           Tables: {
-            [_ in never]: never
+            "colaboradores": {
+                  Row: {
+                    "ativo": boolean,"competencias": (string)[],"created_at": string,"email": string,"horas_dev_semanais": number,"id": string,"jornada_semanal": number,"lider_id": string | null,"nome": string,"papel": Database["public"]['Enums']["papel"],"senioridade": Database["public"]['Enums']["senioridade"] | null,"updated_at": string,"user_id": string | null
+                  }
+                  ComputedFields: never
+                  Insert: {
+                    "ativo"?: boolean,"competencias"?: (string)[],"created_at"?: string,"email": string,"horas_dev_semanais"?: number,"id"?: string,"jornada_semanal"?: number,"lider_id"?: string | null,"nome": string,"papel": Database["public"]['Enums']["papel"],"senioridade"?: Database["public"]['Enums']["senioridade"] | null,"updated_at"?: string,"user_id"?: string | null
+                  }
+                  Update: {
+                    "ativo"?: boolean,"competencias"?: (string)[],"created_at"?: string,"email"?: string,"horas_dev_semanais"?: number,"id"?: string,"jornada_semanal"?: number,"lider_id"?: string | null,"nome"?: string,"papel"?: Database["public"]['Enums']["papel"],"senioridade"?: Database["public"]['Enums']["senioridade"] | null,"updated_at"?: string,"user_id"?: string | null
+                  }
+                  Relationships: [
+                    {
+      foreignKeyName: "colaboradores_lider_id_fkey"
+      columns: ["lider_id"]
+isOneToOne: false
+      referencedRelation: "colaboradores"
+      referencedColumns: ["id"]
+    }
+                  ]
+                },"configuracoes": {
+                  Row: {
+                    "dia_limite_fechamento": number,"dias_alerta_projeto_sem_atualizacao": number,"id": boolean,"pct_alerta_contrato": number,"pct_interno": number,"pct_planejado": number,"pct_reserva": number,"updated_at": string,"updated_by": string | null
+                  }
+                  ComputedFields: never
+                  Insert: {
+                    "dia_limite_fechamento"?: number,"dias_alerta_projeto_sem_atualizacao"?: number,"id"?: boolean,"pct_alerta_contrato"?: number,"pct_interno"?: number,"pct_planejado"?: number,"pct_reserva"?: number,"updated_at"?: string,"updated_by"?: string | null
+                  }
+                  Update: {
+                    "dia_limite_fechamento"?: number,"dias_alerta_projeto_sem_atualizacao"?: number,"id"?: boolean,"pct_alerta_contrato"?: number,"pct_interno"?: number,"pct_planejado"?: number,"pct_reserva"?: number,"updated_at"?: string,"updated_by"?: string | null
+                  }
+                  Relationships: [
+                    {
+      foreignKeyName: "configuracoes_updated_by_fkey"
+      columns: ["updated_by"]
+isOneToOne: false
+      referencedRelation: "colaboradores"
+      referencedColumns: ["id"]
+    }
+                  ]
+                }
           }
           Views: {
             [_ in never]: never
           }
           Functions: {
-            [_ in never]: never
+            "colaborador_atual_id":
+{ Args: Record<PropertyKey, never>; Returns: string
+                           },
+"lidera":
+{ Args: { "p_colaborador_id": string }; Returns: boolean
+                           },
+"papel_atual":
+{ Args: Record<PropertyKey, never>; Returns: Database["public"]['Enums']["papel"]
+                           },
+"tem_papel":
+{ Args: { "papeis": (Database["public"]['Enums']["papel"])[] }; Returns: boolean
+                           }
           }
           Enums: {
-            [_ in never]: never
+            "papel": "proprietario"|"lider_tecnico"|"desenvolvedor"|"administrativo","senioridade": "junior"|"pleno"|"senior"|"especialista"
           }
           CompositeTypes: {
             [_ in never]: never
@@ -130,7 +181,7 @@ export type CompositeTypes<
 export const Constants = {
   "public": {
           Enums: {
-            
+            "papel": ["proprietario", "lider_tecnico", "desenvolvedor", "administrativo"],"senioridade": ["junior", "pleno", "senior", "especialista"]
           }
         }
 } as const
