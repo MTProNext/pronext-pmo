@@ -71,6 +71,28 @@ export const TIPO_DEMANDA_LABEL: Record<Enums<"tipo_demanda">, string> = {
   atividade_interna: "Atividade interna",
 };
 
+export const STATUS_SEMANA_LABEL: Record<Enums<"status_semana">, string> = {
+  rascunho: "Rascunho",
+  publicada: "Publicada",
+  confirmada: "Confirmada",
+  em_execucao: "Em execução",
+  revisada: "Revisada",
+};
+
+export const FAIXA_LABEL: Record<Enums<"faixa_capacidade">, string> = {
+  planejado: "Planejado",
+  reserva: "Reserva",
+  interno: "Interno",
+};
+
+export const TIPO_REPLANEJAMENTO_LABEL: Record<Enums<"tipo_replanejamento">, string> = {
+  inclusao: "Inclusão",
+  alteracao_horas: "Alteração de horas",
+  remocao: "Remoção",
+  entrada_p1_p2: "Entrada P1/P2",
+  outro: "Outro",
+};
+
 /** Converte um mapa de rótulos em opções para Select. */
 export const opcoesDe = (rotulos: Record<string, string>) =>
   Object.entries(rotulos).map(([valor, rotulo]) => ({ valor, rotulo }));

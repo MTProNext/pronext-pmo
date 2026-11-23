@@ -16,6 +16,9 @@ const CONSTRAINTS: Record<string, string> = {
   demandas_interna_sem_contrato_projeto: "Demanda interna não pode ter contrato nem projeto.",
   demandas_atividade_interna_sem_cliente: "Atividade interna não pode ter cliente.",
   demandas_estimativa_horas_check: "A estimativa não pode ser negativa.",
+  planejamento_itens_horas_planejadas_check: "As horas planejadas precisam ser maiores que zero.",
+  semanas_inicio_segunda: "A semana precisa começar numa segunda-feira.",
+  replanejamentos_motivo_impacto: "Informe o motivo e o impacto do replanejamento.",
 };
 
 export function traduzirErro(erro: ErroSupabase): string {

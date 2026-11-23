@@ -65,6 +65,7 @@ export function useAlterarStatusDemanda() {
       const { error } = await supabase.from("demandas").update({ status }).eq("id", id);
       if (error) throw error;
     },
-    { invalidar: [["demandas"]], sucesso: "Status atualizado." },
+    // "planejamento" porque a grade e "Minha semana" mostram o status da demanda.
+    { invalidar: [["demandas"], ["planejamento"]], sucesso: "Status atualizado." },
   );
 }

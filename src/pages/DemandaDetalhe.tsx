@@ -9,6 +9,7 @@ import { SecaoCard } from "@/components/comum/SecaoCard";
 import { Selo } from "@/components/comum/Selo";
 import { DadosDemanda } from "@/components/backlog/DadosDemanda";
 import { FormularioDemanda } from "@/components/backlog/FormularioDemanda";
+import { HistoricoPlanejamento } from "@/components/backlog/HistoricoPlanejamento";
 import { MenuStatusDemanda } from "@/components/backlog/MenuStatusDemanda";
 import { useDemanda } from "@/hooks/useDemandas";
 import { usePermissao } from "@/hooks/usePermissao";
@@ -81,11 +82,8 @@ const DemandaDetalhe = () => {
             {demanda.descricao || <span className="text-muted-foreground">Sem descrição.</span>}
           </p>
         </SecaoCard>
-        <SecaoCard
-          titulo="Planejamento e replanejamentos"
-          descricao="Alocações semanais e histórico de replanejamentos aparecem aqui a partir da etapa 4."
-        >
-          <p className="text-sm text-muted-foreground">Nenhuma alocação registrada.</p>
+        <SecaoCard titulo="Planejamento e replanejamentos" descricao="Horas alocadas por semana e alterações registradas.">
+          <HistoricoPlanejamento demandaId={demanda.id} />
         </SecaoCard>
       </Pagina>
       {podeEditar && <FormularioDemanda aberto={formAberto} onAbertoChange={setFormAberto} demanda={demanda} />}

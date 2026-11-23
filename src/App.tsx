@@ -21,6 +21,7 @@ import MinhaSemana from "@/pages/MinhaSemana";
 import NotFound from "@/pages/NotFound";
 import Planejamento from "@/pages/Planejamento";
 import RedefinirSenha from "@/pages/RedefinirSenha";
+import ReplanejamentosSemana from "@/pages/ReplanejamentosSemana";
 
 const queryClient = new QueryClient({
   defaultOptions: { queries: { staleTime: 30_000, refetchOnWindowFocus: false } },
@@ -33,6 +34,12 @@ const queryClient = new QueryClient({
 const ROTAS: { caminho: string; pagina: JSX.Element; menu?: string }[] = [
   { caminho: "/minha-semana", pagina: <MinhaSemana /> },
   { caminho: "/planejamento", pagina: <Planejamento /> },
+  { caminho: "/planejamento/:inicio", pagina: <Planejamento />, menu: "/planejamento" },
+  {
+    caminho: "/planejamento/:inicio/replanejamentos",
+    pagina: <ReplanejamentosSemana />,
+    menu: "/planejamento",
+  },
   { caminho: "/backlog", pagina: <Backlog /> },
   { caminho: "/backlog/:id", pagina: <DemandaDetalhe />, menu: "/backlog" },
   { caminho: "/cadastros/colaboradores", pagina: <Colaboradores /> },

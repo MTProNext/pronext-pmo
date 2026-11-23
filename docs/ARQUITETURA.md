@@ -15,7 +15,10 @@ Documento vivo: atualizado a cada etapa. Serve de contexto para o Lovable e o Cl
   de detalhe com edição e troca de status.
 - **Fase 1, etapa 4A (planejamento: banco e regras)**: concluída. Semanas, itens,
   replanejamentos, capacidade efetiva, views de capacidade e pendências da etapa 3.
-- Próxima: etapa 4B (telas de planejamento, replanejamento e "Minha semana").
+- **Ajustes da 4A**: `hoje_brasil()` (fuso America/Sao_Paulo) e replanejamentos
+  automáticos pendentes até o líder completar motivo e impacto.
+- **Fase 1, etapa 4B (planejamento: telas)**: concluída. Grade da semana, ciclo de vida,
+  replanejamento, aviso de pendentes, log da semana e "Minha semana". **Fase 1 completa.**
 
 ## Stack
 - Vite 5 + React 18 + TypeScript (SPA), plugin `@vitejs/plugin-react-swc`
@@ -54,6 +57,11 @@ supabase/
 - Dev server na porta 8080 (padrão Lovable).
 
 ## Convenções do banco
+- **"Hoje" é sempre `public.hoje_brasil()`** (data em America/Sao_Paulo). Nunca usar
+  `current_date` nem `now()::date` em regras de negócio, defaults ou views: o banco roda em
+  UTC e, depois das 21h de Brasília, já seria o dia seguinte. Vale para as próximas fases
+  (prazo de apontamento, fechamento mensal, projetos sem atualização...). Em testes, o
+  instante pode ser simulado com `set_config('pmo.agora', '<timestamptz>', true)`.
 - Nomes em português, `snake_case`, sem acento.
 - `id uuid`, `created_at`, `updated_at` (trigger `set_updated_at`).
 - Nada é excluído quando há histórico: usa-se `ativo = false` ou status `cancelada`.
@@ -165,11 +173,17 @@ Triggers adicionados na etapa 4A:
 - `planejamento_itens_marcar_planejada`: alocação em semana publicada ou posterior muda a
   demanda `nova`/`priorizada` para `planejada` (o mesmo acontece para toda a grade ao publicar).
 
-### `replanejamentos` (log, só inclusão, sem update/delete)
+### `replanejamentos` (log imutável)
 `semana_id`, `tipo`, `demanda_id`, `planejamento_item_id` (set null se o item sair),
-`colaborador_afetado_id`, `horas_antes`, `horas_depois`, `motivo`, `impacto` (ambos
-obrigatórios), `responsavel_id`, `created_at`, `created_by`. Gravado só por
-`replanejar_item()` e pelo trigger de P1/P2.
+`colaborador_afetado_id`, `horas_antes`, `horas_depois`, `motivo`, `impacto`,
+`responsavel_id`, `pendente`, `descricao_auto`, `completado_em`, `completado_por`,
+`created_at`, `created_by`.
+- Gravado só por `replanejar_item()` (motivo e impacto obrigatórios) e pelo trigger de
+  P1/P2, que cria o registro **pendente** (sem motivo/impacto, com `descricao_auto`).
+- Constraint `replanejamentos_motivo_impacto`: motivo e impacto obrigatórios quando não pendente.
+- Trigger `replanejamentos_imutavel`: nenhuma alteração ou exclusão, exceto completar um
+  pendente (motivo, impacto, `pendente = false`, quem e quando) e o set null da FK do item.
+- `completar_replanejamento(id, motivo, impacto)`: só líder técnico, só registros pendentes.
 
 ### Funções do planejamento
 | Função | O que faz |
@@ -181,6 +195,8 @@ obrigatórios), `responsavel_id`, `created_at`, `created_by`. Gravado só por
 | `semana_visivel(semana_id)` | Rascunho só para Proprietário e Líder |
 | `alocado_na_demanda(demanda_id)` | Usuário alocado na demanda em semana publicada/confirmada/em execução |
 | `alterando_planejamento()` | Sinalizador de transação usado pelas funções acima para passar pelos triggers de guarda |
+| `completar_replanejamento(id, motivo, impacto)` | Líder técnico completa um replanejamento pendente |
+| `hoje_brasil()` | Data de hoje em America/Sao_Paulo (usar em toda regra com "hoje") |
 
 ### Views (security_invoker)
 - `v_capacidade_colaborador_semana`: por semana × colaborador com horas de dev:
@@ -191,13 +207,13 @@ obrigatórios), `responsavel_id`, `created_at`, `created_by`. Gravado só por
 - `v_resumo_semana`: por semana: `capacidade_total`, percentuais e `limite_planejado/
   reserva/interno` (capacidade × % da configuração), horas por faixa, `ocupacao_pct`,
   `alerta_planejado/reserva/interno` (horas da faixa > limite),
-  `colaboradores_acima_capacidade` e `replanejamentos` (quantidade).
+  `colaboradores_acima_capacidade`, `replanejamentos` e `replanejamentos_pendentes`.
 
 ### Seed do planejamento
 Semanas 16/11/2026 (revisada, feriado 20/11), 23/11/2026 (em execução, com treinamento de
 meio período do Rafael, ausência da Juliana e meio período da Fernanda) e 30/11/2026
 (rascunho, Diego acima da capacidade por causa do treinamento). Quatro replanejamentos de
-exemplo nas semanas publicadas.
+exemplo nas semanas publicadas e um pendente (DEM-0014, P1 que entrou em 24/11).
 
 ## Perfis e RLS
 
@@ -284,6 +300,7 @@ regras em todas as telas novas.
 | `CampoTexto`, `CampoTextoLongo`, `CampoNumero`, `CampoSwitch` | Campos de formulário (`CamposFormulario.tsx`); `CampoNumero` grava `null` quando vazio |
 | `CampoSelect` | Select de formulário; com `rotuloNenhum` aceita `null` (ex.: "Sem contrato") |
 | `CampoData` | Popover + Calendar (ptBR); valor `"aaaa-mm-dd"` ou `null` (`opcional` mostra botão limpar) |
+| `Indicador` | Card de indicador: rótulo pequeno, número grande, descrição; `alerta` deixa o número em `text-destructive` |
 
 ### Esqueleto de uma tela de lista
 ```tsx
@@ -320,6 +337,30 @@ As colunas ficam em `components/<modulo>/colunas<Modulo>.tsx` para manter a pág
   status por `DropdownMenu`; status destrutivo (cancelar) pede `ConfirmacaoDialog`
   (use `rotuloCancelar="Voltar"` quando a ação também se chama "Cancelar ...").
 
+### Planejamento (`components/planejamento`)
+- Página `Planejamento` atende `/planejamento` (semana atual) e `/planejamento/:inicio`
+  (data de uma segunda-feira; datas inválidas voltam para `/planejamento`). Navegação
+  anterior/atual/próxima; semana inexistente mostra "Criar semana em rascunho" para o líder.
+- `ConteudoSemana`: `AvisoPendentes` (Alert destrutivo com "Completar"),
+  `IndicadoresSemana` (4 × `Indicador`), `FaixasCapacidade` (`Progress` por faixa, em
+  `destructive` quando estoura o limite) e `GradePlanejamento`.
+- Grade: `montarGrade()` (função pura) agrupa itens por cliente/projeto (Interno por
+  último), ordena por prioridade e calcula subtotais. Linhas = demandas, colunas = pessoas
+  (`v_capacidade_colaborador_semana`), rodapé = capacidade, planejado e saldo; quem passa
+  da capacidade fica com ícone e texto `destructive`. Faixas diferentes de "planejado"
+  aparecem em texto pequeno abaixo das horas.
+- Clique numa célula (líder, semana não revisada) abre `DialogAlocacao`: em rascunho grava
+  direto (upsert/delete); depois de publicada vira replanejamento (horas antes/depois,
+  motivo, impacto) via `replanejar_item`. "Adicionar alocação" abre o mesmo diálogo sem
+  demanda/pessoa fixas.
+- `AcoesSemana`: um botão com o próximo passo do ciclo (Publicar, Confirmar, Iniciar
+  execução, Marcar como revisada), sempre com `ConfirmacaoDialog`.
+- Após qualquer ação, invalidar `["semanas"]`, `["planejamento"]` e `["demandas"]`
+  (`hooks/useAcoesPlanejamento.ts`).
+- "Minha semana": mesma navegação; rascunho é tratado como "não publicado"; indicadores
+  pessoais e tabela com `StatusRapido` (Planejada, Em execução, Bloqueada, Concluída),
+  desabilitado em semana revisada.
+
 ### Selos (`src/lib/selos.ts`)
 Só variantes do `Badge`, com cores discretas:
 
@@ -330,9 +371,9 @@ Só variantes do `Badge`, com cores discretas:
 | `secondary` | estado normal do fluxo | P3 · Normal, Priorizada, Planejada, Publicada, Concluída, Ativo |
 | `outline` | neutro, inicial ou encerrado | P4 · Baixa, Nova, Cancelada, Rascunho, Revisada, Inativo |
 
-Mapas já definidos: `SELO_SITUACAO`, `SELO_STATUS_CONTRATO`, `SELO_STATUS_PROJETO`,
-`SELO_PRIORIDADE`, `SELO_STATUS_DEMANDA` (tipados com `Enums<>`) e `SELO_STATUS_SEMANA`
-(tipar com `Enums<>` na etapa 4). Estimativa nula aparece como Badge `outline`
+Mapas já definidos (todos tipados com `Enums<>`): `SELO_SITUACAO`, `SELO_STATUS_CONTRATO`,
+`SELO_STATUS_PROJETO`, `SELO_PRIORIDADE`, `SELO_STATUS_DEMANDA`, `SELO_STATUS_SEMANA` e
+`SELO_FAIXA`. Estimativa nula aparece como Badge `outline`
 "A definir" (`components/backlog/Estimativa.tsx`). Contrato suspenso usa `default`;
 projeto bloqueado usa `destructive`.
 
@@ -343,8 +384,10 @@ projeto bloqueado usa `destructive`.
 | `/login` | `Login` (com "Esqueci a senha") | público |
 | `/redefinir-senha` | `RedefinirSenha` (destino do link de recuperação) | link do e-mail |
 | `/acesso-nao-configurado` | usuário sem colaborador vinculado | autenticado |
-| `/minha-semana` | `MinhaSemana` (placeholder, etapa 4) | dev, líder |
-| `/planejamento` | `Planejamento` (placeholder, etapa 4) | líder, proprietário, administrativo |
+| `/minha-semana` | `MinhaSemana` (programação publicada, troca rápida de status) | dev, líder |
+| `/planejamento` | `Planejamento` da semana atual | líder, proprietário, administrativo |
+| `/planejamento/:inicio` | `Planejamento` da semana que começa em `:inicio` (segunda-feira) | idem |
+| `/planejamento/:inicio/replanejamentos` | `ReplanejamentosSemana` (log; completar pendentes) | idem |
 | `/backlog` | `Backlog` (lista; filtro padrão "Em aberto") | todos (dev e adm só leem) |
 | `/backlog/:id` | `DemandaDetalhe` (editar e mudar status: líder e proprietário) | todos |
 | `/cadastros/colaboradores` | `Colaboradores` (somente leitura) | proprietário, administrativo, líder |
@@ -395,7 +438,13 @@ menu. Esse controle é só de interface; a segurança está na RLS.
   via PostgREST). Sem usuário autenticado (seed, service role) os guardas não se aplicam.
 - Proprietário acompanha o planejamento (lê tudo, inclusive rascunho), mas não avança
   semana nem replaneja; isso é do líder técnico.
-- O banco roda em UTC; a regra de P1/P2 usa `current_date` do banco.
+- O banco roda em UTC; por isso toda regra com "hoje" usa `hoje_brasil()` (ver convenções).
+- No front, "semana atual" usa a data do navegador (`lib/semana.ts`), que já está no fuso
+  do usuário.
+- Planejamento e replanejamento só pelo líder técnico; Proprietário e Administrativo veem a
+  grade em modo leitura (o Administrativo não vê rascunhos).
+- A página de detalhe da demanda mostra alocações e replanejamentos dela
+  (`HistoricoPlanejamento`).
 - Recuperação de senha: `resetPasswordForEmail` com retorno em `/redefinir-senha`
   (permitido em `additional_redirect_urls` do `config.toml`). Localmente o e-mail chega no
   Mailpit (http://127.0.0.1:54324). Na nuvem, configurar as Redirect URLs do Auth.

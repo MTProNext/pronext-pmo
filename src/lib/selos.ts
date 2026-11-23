@@ -1,6 +1,8 @@
 import type { Enums } from "@/integrations/supabase/types";
 import {
+  FAIXA_LABEL,
   PRIORIDADE_LABEL,
+  STATUS_SEMANA_LABEL,
   STATUS_CONTRATO_LABEL,
   STATUS_DEMANDA_LABEL,
   STATUS_PROJETO_LABEL,
@@ -61,13 +63,18 @@ export const SELO_STATUS_DEMANDA: MapaSelos<Enums<"status_demanda">> = {
   cancelada: { rotulo: D.cancelada, variante: "outline" },
 };
 
-// O mapa abaixo segue o enum aprovado no passo 1; tipar com Enums<"status_semana"> na etapa 4.
-export const SELO_STATUS_SEMANA: MapaSelos<
-  "rascunho" | "publicada" | "confirmada" | "em_execucao" | "revisada"
-> = {
-  rascunho: { rotulo: "Rascunho", variante: "outline" },
-  publicada: { rotulo: "Publicada", variante: "secondary" },
-  confirmada: { rotulo: "Confirmada", variante: "secondary" },
-  em_execucao: { rotulo: "Em execução", variante: "default" },
-  revisada: { rotulo: "Revisada", variante: "outline" },
+const S = STATUS_SEMANA_LABEL;
+export const SELO_STATUS_SEMANA: MapaSelos<Enums<"status_semana">> = {
+  rascunho: { rotulo: S.rascunho, variante: "outline" },
+  publicada: { rotulo: S.publicada, variante: "secondary" },
+  confirmada: { rotulo: S.confirmada, variante: "secondary" },
+  em_execucao: { rotulo: S.em_execucao, variante: "default" },
+  revisada: { rotulo: S.revisada, variante: "outline" },
+};
+
+const F = FAIXA_LABEL;
+export const SELO_FAIXA: MapaSelos<Enums<"faixa_capacidade">> = {
+  planejado: { rotulo: F.planejado, variante: "secondary" },
+  reserva: { rotulo: F.reserva, variante: "outline" },
+  interno: { rotulo: F.interno, variante: "outline" },
 };

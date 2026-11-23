@@ -21,6 +21,16 @@ export const formatPeriodo = (inicio: string, fim: string | null) => {
 export const formatHours = (hours: number) =>
   `${hours.toLocaleString("pt-BR", { maximumFractionDigits: 2 })}h`;
 
+/** Número com vírgula decimal, sem unidade (ex.: 20,8). Usado em grades compactas. */
+export const formatNumero = (n: number) => n.toLocaleString("pt-BR", { maximumFractionDigits: 2 });
+
+/** Percentual, ex.: 85,8%. */
+export const formatPct = (n: number | null) =>
+  n === null ? "—" : `${n.toLocaleString("pt-BR", { maximumFractionDigits: 1 })}%`;
+
+/** Data e hora, ex.: 24/11/2026 09:10. */
+export const formatDataHora = (instante: string) => format(new Date(instante), "dd/MM/yyyy HH:mm", { locale: ptBR });
+
 /** Código da demanda, ex.: DEM-0007. */
 export const formatCodigoDemanda = (codigo: number) => `DEM-${String(codigo).padStart(4, "0")}`;
 
