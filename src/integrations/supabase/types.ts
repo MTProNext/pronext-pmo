@@ -343,14 +343,14 @@ isOneToOne: false
                   ]
                 },"replanejamentos": {
                   Row: {
-                    "colaborador_afetado_id": string | null,"created_at": string,"created_by": string | null,"demanda_id": string | null,"horas_antes": number | null,"horas_depois": number | null,"id": string,"impacto": string,"motivo": string,"planejamento_item_id": string | null,"responsavel_id": string,"semana_id": string,"tipo": Database["public"]['Enums']["tipo_replanejamento"]
+                    "colaborador_afetado_id": string | null,"completado_em": string | null,"completado_por": string | null,"created_at": string,"created_by": string | null,"demanda_id": string | null,"descricao_auto": string | null,"horas_antes": number | null,"horas_depois": number | null,"id": string,"impacto": string | null,"motivo": string | null,"pendente": boolean,"planejamento_item_id": string | null,"responsavel_id": string,"semana_id": string,"tipo": Database["public"]['Enums']["tipo_replanejamento"]
                   }
                   ComputedFields: never
                   Insert: {
-                    "colaborador_afetado_id"?: string | null,"created_at"?: string,"created_by"?: string | null,"demanda_id"?: string | null,"horas_antes"?: number | null,"horas_depois"?: number | null,"id"?: string,"impacto": string,"motivo": string,"planejamento_item_id"?: string | null,"responsavel_id": string,"semana_id": string,"tipo": Database["public"]['Enums']["tipo_replanejamento"]
+                    "colaborador_afetado_id"?: string | null,"completado_em"?: string | null,"completado_por"?: string | null,"created_at"?: string,"created_by"?: string | null,"demanda_id"?: string | null,"descricao_auto"?: string | null,"horas_antes"?: number | null,"horas_depois"?: number | null,"id"?: string,"impacto"?: string | null,"motivo"?: string | null,"pendente"?: boolean,"planejamento_item_id"?: string | null,"responsavel_id": string,"semana_id": string,"tipo": Database["public"]['Enums']["tipo_replanejamento"]
                   }
                   Update: {
-                    "colaborador_afetado_id"?: string | null,"created_at"?: string,"created_by"?: string | null,"demanda_id"?: string | null,"horas_antes"?: number | null,"horas_depois"?: number | null,"id"?: string,"impacto"?: string,"motivo"?: string,"planejamento_item_id"?: string | null,"responsavel_id"?: string,"semana_id"?: string,"tipo"?: Database["public"]['Enums']["tipo_replanejamento"]
+                    "colaborador_afetado_id"?: string | null,"completado_em"?: string | null,"completado_por"?: string | null,"created_at"?: string,"created_by"?: string | null,"demanda_id"?: string | null,"descricao_auto"?: string | null,"horas_antes"?: number | null,"horas_depois"?: number | null,"id"?: string,"impacto"?: string | null,"motivo"?: string | null,"pendente"?: boolean,"planejamento_item_id"?: string | null,"responsavel_id"?: string,"semana_id"?: string,"tipo"?: Database["public"]['Enums']["tipo_replanejamento"]
                   }
                   Relationships: [
                     {
@@ -362,6 +362,18 @@ isOneToOne: false
     },{
       foreignKeyName: "replanejamentos_colaborador_afetado_id_fkey"
       columns: ["colaborador_afetado_id"]
+isOneToOne: false
+      referencedRelation: "v_capacidade_colaborador_semana"
+      referencedColumns: ["colaborador_id"]
+    },{
+      foreignKeyName: "replanejamentos_completado_por_fkey"
+      columns: ["completado_por"]
+isOneToOne: false
+      referencedRelation: "colaboradores"
+      referencedColumns: ["id"]
+    },{
+      foreignKeyName: "replanejamentos_completado_por_fkey"
+      columns: ["completado_por"]
 isOneToOne: false
       referencedRelation: "v_capacidade_colaborador_semana"
       referencedColumns: ["colaborador_id"]
@@ -520,7 +532,7 @@ isOneToOne: false
                   ]
                 },"v_resumo_semana": {
                   Row: {
-                    "alerta_interno": boolean | null,"alerta_planejado": boolean | null,"alerta_reserva": boolean | null,"capacidade_total": number | null,"colaboradores_acima_capacidade": number | null,"fim": string | null,"horas_interno": number | null,"horas_planejadas": number | null,"horas_planejado": number | null,"horas_reserva": number | null,"inicio": string,"limite_interno": number | null,"limite_planejado": number | null,"limite_reserva": number | null,"ocupacao_pct": number | null,"pct_interno": number,"pct_planejado": number,"pct_reserva": number,"replanejamentos": number | null,"semana_id": string,"status": Database["public"]['Enums']["status_semana"]
+                    "alerta_interno": boolean | null,"alerta_planejado": boolean | null,"alerta_reserva": boolean | null,"capacidade_total": number | null,"colaboradores_acima_capacidade": number | null,"fim": string | null,"horas_interno": number | null,"horas_planejadas": number | null,"horas_planejado": number | null,"horas_reserva": number | null,"inicio": string,"limite_interno": number | null,"limite_planejado": number | null,"limite_reserva": number | null,"ocupacao_pct": number | null,"pct_interno": number,"pct_planejado": number,"pct_reserva": number,"replanejamentos": number | null,"replanejamentos_pendentes": number | null,"semana_id": string,"status": Database["public"]['Enums']["status_semana"]
                   }
                   ComputedFields: never
                   Relationships: [
@@ -544,8 +556,14 @@ isOneToOne: false
 "colaborador_atual_id":
 { Args: Record<PropertyKey, never>; Returns: string
                            },
+"completar_replanejamento":
+{ Args: { "p_id": string,"p_impacto": string,"p_motivo": string }; Returns: undefined
+                           },
 "eh_lider_tecnico_ativo":
 { Args: { "p_colaborador_id": string }; Returns: boolean
+                           },
+"hoje_brasil":
+{ Args: Record<PropertyKey, never>; Returns: string
                            },
 "horas_indisponiveis":
 { Args: { "p_colaborador_id": string,"p_inicio": string }; Returns: number

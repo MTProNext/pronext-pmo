@@ -207,6 +207,17 @@ insert into public.indisponibilidades (colaborador_id, tipo, data_inicio, data_f
   ('00000000-0000-4000-a000-000000000012', 'ausencia', '2026-11-26', '2026-11-26', null, 'Assunto pessoal', null),
   ('00000000-0000-4000-a000-000000000022', 'ausencia', '2026-11-27', '2026-11-27', 4, 'Consulta médica (meio período)', null);
 
+-- Urgência P1 que entrou durante a semana em execução (o replanejamento pendente
+-- correspondente é inserido mais abaixo, para o seed não depender da data do reset).
+insert into public.demandas
+  (id, titulo, descricao, cliente_id, projeto_id, solicitante, data_entrada,
+   prioridade, lider_id, estimativa_horas, status, tipo)
+values
+  ('00000000-0000-4000-f000-000000000014', 'Falha no envio de pedidos ao ERP',
+   'Pedidos aprovados não chegam ao ERP desde a atualização de ontem.',
+   '00000000-0000-4000-c000-000000000002', '00000000-0000-4000-e000-000000000001',
+   'Otávio Reis', '2026-11-24', 'p1', '00000000-0000-4000-a000-000000000011', null, 'nova', 'urgencia');
+
 -- Semanas
 insert into public.semanas
   (id, inicio, status, publicada_em, publicada_por, confirmada_em, confirmada_por,
@@ -292,3 +303,11 @@ values
   ('00000000-0000-4000-9000-000000000002', 'inclusao', '00000000-0000-4000-f000-000000000007', '00000000-0000-4000-a000-000000000023', 0, 8,
    'Uso da reserva para item priorizado do Cliente A (exportação CSV).', 'Reserva da semana reduzida em 8h.',
    '00000000-0000-4000-a000-000000000011', '2026-11-23 14:30-03');
+
+-- Replanejamento automático ainda pendente (aguardando motivo e impacto do líder)
+insert into public.replanejamentos
+  (semana_id, tipo, demanda_id, pendente, descricao_auto, responsavel_id, created_at)
+values
+  ('00000000-0000-4000-9000-000000000002', 'entrada_p1_p2', '00000000-0000-4000-f000-000000000014', true,
+   'Entrada de demanda P1 · Crítica durante a semana. Líder avalia na hora e define a resposta.',
+   '00000000-0000-4000-a000-000000000011', '2026-11-24 09:10-03');

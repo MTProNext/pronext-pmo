@@ -24,7 +24,7 @@ $$;
 -- Leitura e escrita por perfil
 -- ---------------------------------------------------------------------------
 select pg_temp.entrar_como('dev1@example.com');
-select is((select count(*) from public.demandas), 13::bigint, 'desenvolvedor lê o backlog inteiro');
+select is((select count(*) from public.demandas), 14::bigint, 'desenvolvedor lê o backlog inteiro');
 select throws_ok(
   $$insert into public.demandas (titulo, lider_id) values ('X', '00000000-0000-4000-a000-000000000011')$$,
   '42501', null, 'desenvolvedor não cria demanda'
@@ -48,7 +48,7 @@ select throws_ok(
 select pg_temp.entrar_como('lider2@example.com');
 delete from public.demandas where id = '00000000-0000-4000-f000-000000000013';
 reset role;
-select is((select count(*) from public.demandas), 13::bigint, 'ninguém exclui demandas');
+select is((select count(*) from public.demandas), 14::bigint, 'ninguém exclui demandas');
 
 -- ---------------------------------------------------------------------------
 -- Validações
@@ -98,7 +98,7 @@ select is(
   'demanda de projeto herda o contrato do projeto'
 );
 select ok(
-  (select codigo from public.demandas where id = '00000000-0000-4000-f000-0000000000aa') > 13,
+  (select codigo from public.demandas where id = '00000000-0000-4000-f000-0000000000aa') > 14,
   'código sequencial gerado automaticamente'
 );
 
