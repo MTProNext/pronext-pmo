@@ -1,14 +1,21 @@
-import { CabecalhoPagina } from "@/components/layout/CabecalhoPagina";
-import { EmConstrucao } from "@/components/layout/EmConstrucao";
+import { Construction } from "lucide-react";
+import { EstadoVazio } from "@/components/comum/EstadoVazio";
+import { Pagina } from "@/components/comum/Pagina";
+import { SecaoCard } from "@/components/comum/SecaoCard";
 
 const Planejamento = () => (
-  <>
-    <CabecalhoPagina
-      titulo="Planejamento semanal"
-      descricao="Grade de demandas × colaboradores e capacidade efetiva da semana."
-    />
-    <EmConstrucao etapa="etapa 4 da Fase 1" />
-  </>
+  <Pagina
+    titulo="Planejamento semanal"
+    descricao="Grade de demandas × colaboradores e capacidade efetiva da semana."
+  >
+    <SecaoCard>
+      <EstadoVazio
+        icone={Construction}
+        titulo="Tela em construção"
+        descricao="Disponível na etapa 4 da Fase 1 (planejamento semanal)."
+      />
+    </SecaoCard>
+  </Pagina>
 );
 
 export default Planejamento;

@@ -1,9 +1,8 @@
-import { NavLink } from "react-router-dom";
-import { LogOut } from "lucide-react";
+import { NavLink, useLocation } from "react-router-dom";
+import { Briefcase } from "lucide-react";
 import {
   Sidebar,
   SidebarContent,
-  SidebarFooter,
   SidebarGroup,
   SidebarGroupContent,
   SidebarGroupLabel,
@@ -11,13 +10,15 @@ import {
   SidebarMenu,
   SidebarMenuButton,
   SidebarMenuItem,
+  SidebarRail,
 } from "@/components/ui/sidebar";
 import { useSessao } from "@/hooks/useSessao";
-import { PAPEL_LABEL } from "@/lib/papeis";
 import { NAVEGACAO } from "./navegacao";
 
+/** Menu lateral recolhível (modo ícone), filtrado pelo perfil do usuário. */
 export function AppSidebar() {
-  const { colaborador, sair } = useSessao();
+  const { colaborador } = useSessao();
+  const { pathname } = useLocation();
   if (!colaborador) return null;
 
   const grupos = NAVEGACAO.map((g) => ({
@@ -26,9 +27,23 @@ export function AppSidebar() {
   })).filter((g) => g.itens.length > 0);
 
   return (
-    <Sidebar>
-      <SidebarHeader className="px-4 py-3">
-        <span className="text-lg font-semibold">PMO ProNext</span>
+    <Sidebar collapsible="icon">
+      <SidebarHeader>
+        <SidebarMenu>
+          <SidebarMenuItem>
+            <SidebarMenuButton size="lg" asChild>
+              <NavLink to="/">
+                <div className="flex aspect-square size-8 items-center justify-center rounded-lg bg-sidebar-primary text-sidebar-primary-foreground">
+                  <Briefcase className="size-4" />
+                </div>
+                <div className="grid flex-1 text-left text-sm leading-tight">
+                  <span className="truncate font-semibold">PMO ProNext</span>
+                  <span className="truncate text-xs">Capacidade, horas e projetos</span>
+                </div>
+              </NavLink>
+            </SidebarMenuButton>
+          </SidebarMenuItem>
+        </SidebarMenu>
       </SidebarHeader>
       <SidebarContent>
         {grupos.map((grupo) => (
@@ -38,14 +53,16 @@ export function AppSidebar() {
               <SidebarMenu>
                 {grupo.itens.map((item) => (
                   <SidebarMenuItem key={item.rota}>
-                    <NavLink to={item.rota}>
-                      {({ isActive }) => (
-                        <SidebarMenuButton isActive={isActive}>
-                          <item.icone />
-                          <span>{item.titulo}</span>
-                        </SidebarMenuButton>
-                      )}
-                    </NavLink>
+                    <SidebarMenuButton
+                      asChild
+                      tooltip={item.titulo}
+                      isActive={pathname === item.rota || pathname.startsWith(`${item.rota}/`)}
+                    >
+                      <NavLink to={item.rota}>
+                        <item.icone />
+                        <span>{item.titulo}</span>
+                      </NavLink>
+                    </SidebarMenuButton>
                   </SidebarMenuItem>
                 ))}
               </SidebarMenu>
@@ -53,16 +70,7 @@ export function AppSidebar() {
           </SidebarGroup>
         ))}
       </SidebarContent>
-      <SidebarFooter className="border-t px-4 py-3">
-        <div className="text-sm font-medium">{colaborador.nome}</div>
-        <div className="text-xs text-muted-foreground">{PAPEL_LABEL[colaborador.papel]}</div>
-        <button
-          onClick={sair}
-          className="mt-2 flex items-center gap-2 text-sm text-muted-foreground hover:text-foreground"
-        >
-          <LogOut className="h-4 w-4" /> Sair
-        </button>
-      </SidebarFooter>
+      <SidebarRail />
     </Sidebar>
   );
 }

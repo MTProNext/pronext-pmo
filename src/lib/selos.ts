@@ -1,0 +1,48 @@
+/**
+ * Rótulo e variante do Badge para cada valor de status/prioridade.
+ * Regra de cor (discreta, só variantes do shadcn):
+ * - destructive: exige ação imediata (P1, bloqueada)
+ * - default:     em andamento / destaque (P2, em execução)
+ * - secondary:   estados normais do fluxo
+ * - outline:     neutro, inicial ou encerrado
+ */
+export type VarianteSelo = "default" | "secondary" | "destructive" | "outline";
+
+export type MapaSelos<T extends string> = Record<T, { rotulo: string; variante: VarianteSelo }>;
+
+export const SELO_SITUACAO: MapaSelos<"ativo" | "inativo"> = {
+  ativo: { rotulo: "Ativo", variante: "secondary" },
+  inativo: { rotulo: "Inativo", variante: "outline" },
+};
+
+// Os mapas abaixo seguem os enums aprovados no passo 1. Quando os enums forem
+// criados no banco (etapas 3 e 4), troque as uniões literais por Enums<"...">.
+
+export const SELO_PRIORIDADE: MapaSelos<"p1" | "p2" | "p3" | "p4"> = {
+  p1: { rotulo: "P1 · Crítica", variante: "destructive" },
+  p2: { rotulo: "P2 · Alta", variante: "default" },
+  p3: { rotulo: "P3 · Normal", variante: "secondary" },
+  p4: { rotulo: "P4 · Baixa", variante: "outline" },
+};
+
+export const SELO_STATUS_DEMANDA: MapaSelos<
+  "nova" | "priorizada" | "planejada" | "em_execucao" | "bloqueada" | "concluida" | "cancelada"
+> = {
+  nova: { rotulo: "Nova", variante: "outline" },
+  priorizada: { rotulo: "Priorizada", variante: "secondary" },
+  planejada: { rotulo: "Planejada", variante: "secondary" },
+  em_execucao: { rotulo: "Em execução", variante: "default" },
+  bloqueada: { rotulo: "Bloqueada", variante: "destructive" },
+  concluida: { rotulo: "Concluída", variante: "secondary" },
+  cancelada: { rotulo: "Cancelada", variante: "outline" },
+};
+
+export const SELO_STATUS_SEMANA: MapaSelos<
+  "rascunho" | "publicada" | "confirmada" | "em_execucao" | "revisada"
+> = {
+  rascunho: { rotulo: "Rascunho", variante: "outline" },
+  publicada: { rotulo: "Publicada", variante: "secondary" },
+  confirmada: { rotulo: "Confirmada", variante: "secondary" },
+  em_execucao: { rotulo: "Em execução", variante: "default" },
+  revisada: { rotulo: "Revisada", variante: "outline" },
+};

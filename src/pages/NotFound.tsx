@@ -1,14 +1,20 @@
 import { Link } from "react-router-dom";
+import { FileQuestion } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { EstadoVazio } from "@/components/comum/EstadoVazio";
 
 const NotFound = () => (
-  <main className="flex min-h-screen items-center justify-center bg-background p-4">
-    <div className="text-center">
-      <h1 className="text-4xl font-bold">404</h1>
-      <p className="mt-2 text-muted-foreground">Página não encontrada.</p>
-      <Link to="/" className="mt-4 inline-block text-primary underline">
-        Voltar ao início
-      </Link>
-    </div>
+  <main className="flex min-h-screen items-center justify-center bg-muted/40 p-4">
+    <EstadoVazio
+      icone={FileQuestion}
+      titulo="Página não encontrada"
+      descricao="O endereço acessado não existe."
+      acao={
+        <Button asChild>
+          <Link to="/">Voltar ao início</Link>
+        </Button>
+      }
+    />
   </main>
 );
 

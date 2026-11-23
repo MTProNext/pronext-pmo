@@ -6,6 +6,8 @@ Documento vivo: atualizado a cada etapa. Serve de contexto para o Lovable e o Cl
 - Passo 0: esqueleto do projeto.
 - **Fase 1, etapa 1 (base e acesso)**: concluída. Colaboradores, vínculo com o Auth,
   funções de RLS, configurações, login, layout com menu por perfil e rotas protegidas.
+- **Padronização visual**: concluída. Tema padrão do shadcn/Lovable e componentes
+  reutilizáveis em `src/components/comum/` (ver "Padrão de interface").
 - Próximas etapas da Fase 1: 2) cadastros, 3) backlog, 4) planejamento semanal.
 
 ## Stack
@@ -19,14 +21,15 @@ Documento vivo: atualizado a cada etapa. Serve de contexto para o Lovable e o Cl
 ## Estrutura de pastas
 ```
 src/
-  components/ui/          # shadcn (gerado pelo CLI)
-  components/auth/        # RotaProtegida, Carregando
-  components/layout/      # AppLayout, AppSidebar, navegacao.ts, CabecalhoPagina
+  components/ui/          # shadcn (gerado pelo CLI, não editar à mão)
+  components/comum/       # padrões de interface reutilizáveis (ver "Padrão de interface")
+  components/auth/        # RotaProtegida
+  components/layout/      # AppLayout, AppSidebar, navegacao.ts
   components/<modulo>/    # componentes por módulo (colaboradores, ...)
   pages/                  # uma página por rota (pages/cadastros/ para cadastros)
   hooks/                  # useSessao (contexto de sessão), hooks de dados
   integrations/supabase/  # client.ts e types.ts (gerado por npm run db:types)
-  lib/                    # utils.ts (cn), format.ts, papeis.ts
+  lib/                    # utils.ts (cn), format.ts, papeis.ts, selos.ts, validacao.ts
 supabase/
   config.toml             # Supabase local (confirmação de e-mail desativada)
   migrations/             # schema versionado
@@ -99,6 +102,81 @@ A divisão de colunas em `configuracoes` é garantida pelo trigger `configuracoe
   só veem semanas `publicada` ou posteriores (inclusive em "Minha semana").
 - Feriados nacionais, estaduais e municipais de 2027 como indisponibilidades globais.
 
+## Padrão de interface
+
+Objetivo: a interface deve ter a aparência de um projeto gerado pelo Lovable. Siga estas
+regras em todas as telas novas.
+
+### Regras gerais
+- **Tema**: o padrão do shadcn/ui (base slate, HSL) definido em `src/index.css`. Não criar
+  cores, fontes, sombras ou CSS próprios; usar apenas classes utilitárias do Tailwind que
+  apontam para as variáveis do tema (`bg-background`, `text-muted-foreground`, `border`...).
+- **Componentes**: só os de `src/components/ui` (shadcn) e os de `src/components/comum`.
+  Ícones só de `lucide-react`. Notificações só com `toast` do `sonner`
+  (`toast.success("Demanda salva.")`, `toast.error(...)`).
+- **Idioma**: textos em pt-BR; datas `dd/mm/aaaa` e horas `1,5h` via `src/lib/format.ts`.
+- **Responsivo**: filtros e ações empilham no celular (`flex-col` → `sm:flex-row`); tabelas
+  rolam na horizontal.
+
+### Layout autenticado (`components/layout`)
+- `AppLayout`: `SidebarProvider` + `AppSidebar` + `SidebarInset`. Cabeçalho com
+  `SidebarTrigger`, título da página (breadcrumb grupo › página, vindo de `navegacao.ts`)
+  e `MenuUsuario` à direita (nome, perfil, e-mail, Sair).
+- `AppSidebar`: `Sidebar collapsible="icon"` (recolhe para ícones, com tooltip), menu
+  filtrado pelo perfil. Para nova tela: adicionar o item em `navegacao.ts` (título, rota,
+  ícone, papéis) e a rota em `App.tsx`.
+
+### Componentes de `components/comum`
+| Componente | Uso |
+|---|---|
+| `Pagina` | Toda página: `titulo`, `descricao`, `acoes` (botões à direita) e o conteúdo |
+| `SecaoCard` | Todo conteúdo fica em Card: `titulo?`, `descricao?`, `acoes?`, `filtros?` |
+| `BarraFiltros` | Linha de filtros acima da lista, com "Limpar filtros" quando há filtro ativo |
+| `CampoBusca` | Busca textual com ícone |
+| `FiltroSelect` | Select de filtro; o valor `TODOS` desliga o filtro |
+| `TabelaDados` | Lista com `Table`: colunas declarativas, skeleton ao carregar, `EstadoVazio` sem dados |
+| `EstadoVazio` | Ícone + título + descrição + ação opcional |
+| `Selo` | `Badge` a partir de um mapa de `src/lib/selos.ts` |
+| `FormularioDialog` | Formulário curto (até ~6 campos) em `Dialog` |
+| `FormularioSheet` | Formulário longo em `Sheet` lateral |
+| `BotoesFormulario` | Rodapé Cancelar/Salvar com estado de envio (usado pelos dois acima) |
+| `ConfirmacaoDialog` | `AlertDialog` antes de ações relevantes (cancelar, inativar, publicar) |
+| `MenuUsuario` | Menu do usuário no cabeçalho |
+| `Carregando` | Spinner de página inteira (sessão e redirecionamentos) |
+
+### Esqueleto de uma tela de lista
+```tsx
+<Pagina titulo="Clientes" descricao="..." acoes={<Button><Plus /> Novo cliente</Button>}>
+  <SecaoCard filtros={<BarraFiltros ...><CampoBusca .../><FiltroSelect .../></BarraFiltros>}>
+    <TabelaDados colunas={COLUNAS} dados={filtrados} carregando={isLoading}
+                 chaveLinha={(c) => c.id} vazio={{ titulo: "Nenhum cliente encontrado" }} />
+  </SecaoCard>
+</Pagina>
+```
+As colunas ficam em `components/<modulo>/colunas<Modulo>.tsx` para manter a página pequena.
+
+### Formulários
+- `react-hook-form` + `zodResolver`; campos com `FormField`/`FormItem`/`FormLabel`/
+  `FormControl`/`FormMessage` do shadcn.
+- Mensagens padrão do zod em pt-BR via `src/lib/validacao.ts` (importado em `main.tsx`);
+  mensagens específicas podem ser passadas no esquema.
+- Após salvar: `toast.success`, fechar o Dialog/Sheet e invalidar a query do react-query.
+  Erro do Supabase: `toast.error` com a mensagem (as mensagens dos triggers já são pt-BR).
+
+### Selos (`src/lib/selos.ts`)
+Só variantes do `Badge`, com cores discretas:
+
+| Variante | Significado | Exemplos |
+|---|---|---|
+| `destructive` | exige ação imediata | P1 · Crítica, Bloqueada |
+| `default` | em andamento / destaque | P2 · Alta, Em execução |
+| `secondary` | estado normal do fluxo | P3 · Normal, Priorizada, Planejada, Publicada, Concluída, Ativo |
+| `outline` | neutro, inicial ou encerrado | P4 · Baixa, Nova, Cancelada, Rascunho, Revisada, Inativo |
+
+Mapas já definidos: `SELO_SITUACAO`, `SELO_PRIORIDADE`, `SELO_STATUS_DEMANDA`,
+`SELO_STATUS_SEMANA`. Quando os enums forem criados no banco, tipar os mapas com
+`Enums<"...">`.
+
 ## Rotas
 | Rota | Página | Perfis |
 |---|---|---|
@@ -126,5 +204,9 @@ menu. Esse controle é só de interface; a segurança está na RLS.
   e Administrativo gravam nela, ninguém altera o próprio papel.
 - Usuários de teste criados direto em `auth.users`/`auth.identities` pelo seed; na Fase 1
   não há criação de login pela aplicação (exigiria Edge Function com service role).
+- O `shadcn init` gerou variáveis de cor em `oklch` (formato do Tailwind 4), incompatíveis
+  com o `hsl(var(--x))` do Tailwind 3. Substituídas pelo tema slate em HSL do template
+  Lovable, e `tailwind.config.ts` alinhado ao mesmo template (inclui `container` e
+  `destructive-foreground`).
 - Embed do líder no PostgREST usa a coluna (`lider:lider_id(nome)`) para garantir a
   direção muitos-para-um na autorreferência.

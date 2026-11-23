@@ -1,7 +1,7 @@
 import { Navigate } from "react-router-dom";
 import { useSessao } from "@/hooks/useSessao";
 import { ROTA_INICIAL } from "@/lib/papeis";
-import { Carregando } from "@/components/auth/Carregando";
+import { Carregando } from "@/components/comum/Carregando";
 
 /** Rota "/": redireciona para a tela inicial do perfil. */
 const Index = () => {

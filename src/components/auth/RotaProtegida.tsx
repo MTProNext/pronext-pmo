@@ -1,7 +1,7 @@
 import { Navigate, Outlet, useLocation } from "react-router-dom";
 import { useSessao } from "@/hooks/useSessao";
 import { ROTA_INICIAL, type Papel } from "@/lib/papeis";
-import { Carregando } from "./Carregando";
+import { Carregando } from "@/components/comum/Carregando";
 
 interface Props {
   /** Perfis que podem acessar. Omitido = qualquer colaborador ativo. */

@@ -54,3 +54,12 @@ export const NAVEGACAO: GrupoNavegacao[] = [
 /** Papéis permitidos em uma rota do menu. */
 export const papeisDaRota = (rota: string): Papel[] =>
   NAVEGACAO.flatMap((g) => g.itens).find((i) => i.rota === rota)?.papeis ?? [];
+
+/** Grupo e item do menu correspondentes ao caminho atual (inclui sub-rotas, ex.: /backlog/123). */
+export function encontrarNavegacao(caminho: string) {
+  for (const grupo of NAVEGACAO) {
+    const item = grupo.itens.find((i) => caminho === i.rota || caminho.startsWith(`${i.rota}/`));
+    if (item) return { grupo, item };
+  }
+  return null;
+}
